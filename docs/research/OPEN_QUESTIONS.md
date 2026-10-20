@@ -1,6 +1,6 @@
 # Open questions (priority order)
 
-1. **Durable editor commit:** Which Lua module consumes scenery editor gizmo transforms, constructs a placement change list, and ultimately calls `CreateNewPart` / `EditExistingPart` / `DestroyExistingPart` / `CommitPreview` or equivalent?
+1. **Durable editor commit:** The scenery editor pathway is now visible in `SubModePathSnapPlacement` and brush placement. Can we verify its complete arguments and completion ordering, and expose the same confirmed commit operations through a permitted mod?
 2. **Reproducible placement:** Can a permitted mod invoke the exact operation in a running retail build and does the result survive save/reload?
 3. **Change detection:** Where can we observe only user-confirmed edits rather than previews, transient transforms or drag updates?
 4. **Identifier translation:** How are EntityID, PlacementID, PlacementPartID and saved IDs assigned, mapped and replaced when actions are replayed across different clients?
@@ -15,4 +15,4 @@ An answer requires a source reference and, for runtime claims, a recorded test. 
 
 ## Narrowing from public source research (2026-10-20)
 
-[PC2 mod source now demonstrates the general preview/commit lifecycle](../placement/ACSE_FORGEUTILS.md), including operation-token waiting. Question 1 is narrowed to the scenery operation builder/caller and its arguments; question 2 still requires an actual save/reload experiment. ForgeUtils catalogue registration is not that missing operation. ACSE's serializer must be checked against the actual PC2 package before considering it as an alternate persistence path.
+[PC2 mod source now demonstrates the general preview/commit lifecycle](../placement/ACSE_FORGEUTILS.md), including operation-token waiting. Additional PC2 scenery editor Lua now supplies concrete scenery creation/edit/clone and deferred commit call sites. Question 1 is narrowed to runtime invocation and reliable event interception. Question 2 still requires save/reload tests. ForgeUtils catalogue registration is not that missing operation. ACSE's serializer must be checked against the actual PC2 package before considering it as an alternate persistence path.
