@@ -31,3 +31,7 @@ Enhanced Move Tool hooks scene draggable widgets and reads/manipulates transform
 5. Repeat with move/delete; test undo and redo semantics.
 
 **Not yet demonstrated.**
+
+## ACSE / ForgeUtils follow-up (2026-10-20)
+
+[Source-pinned investigation](ACSE_FORGEUTILS.md) distinguishes catalogue registration from placed instances and identifies a PC2 track mod's concrete preview/commit lifecycle. The scenery-specific creation arguments and save/reload proof remain unresolved.
