@@ -42,4 +42,4 @@ References checked against the upstream repositories on 2026-10-20.
 
 ## Collaboration
 
-Inspired by [Co-op Anything](https://github.com/cranebeaker/coop-anything). Its [AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md) should be reviewed before contributing. The proposed public game claim is captured in [CLAIM.md](CLAIM.md); the submission attempt on 2026-10-20 returned HTTP 403 (`Resource not accessible by integration`), so no issue creation is confirmed.
+Inspired by [Co-op Anything](https://github.com/cranebeaker/coop-anything). Its [AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md) should be reviewed before contributing. The public game claim is tracked in [Co-op Anything issue #74](https://github.com/cranebeaker/coop-anything/issues/74). It describes the current feasibility-research stage; no functioning co-op prototype or persistent programmatic scenery-edit test has been demonstrated.
