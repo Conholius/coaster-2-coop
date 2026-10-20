@@ -25,3 +25,7 @@ These are names of locally researched materials, **not bundled source files**. T
 - `common.moduleutils_unluac.lua`: `DisallowIndexNewIndexExcept` and metatable guards.
 
 **Next evidence improvement:** attach stable source build identification, reproducible extraction steps and hashes of original artifacts in private research records (not proprietary contents). 
+
+## Public source follow-up (2026-10-20)
+
+See [ACSE / ForgeUtils investigation](../placement/ACSE_FORGEUTILS.md) for commit-pinned source references and function-level anchors. ForgeUtils catalogue registration, its Lua hooks, ACSE's tracked-entity serializer and PC-CC's track preview/commit implementation were inspected. These are static source observations; none establishes PC2 scenery save/reload persistence.
