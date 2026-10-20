@@ -22,6 +22,12 @@ Keep `EntityID`, `PlacementID`, `PlacementPartID`, `SaveEntityID`, and any cross
 
 Enhanced Move Tool hooks scene draggable widgets and reads/manipulates transform presentation; the reviewed code did not demonstrate a durable `Undo.CommitPreview` call. ProTrack hooks track-edit preview methods and selected track entities; track behavior cannot be assumed to apply to scenery placement. Cross-title Frontier mods are conceptual references only.
 
+## Scenery edit call path identified in decompiled code (2026-10-20)
+
+The new local evidence is `Editors.Scenery.SubModePathSnapPlacement` (`pathsnap.lua`) and `editors.scenery.brushplacement_unluac.lua` from the scenery archive. In `SubModePathSnapPlacement`, `BeginSubMode` creates an undo hierarchy and starts a preview; `_CreateMoveObject_NewInstance` calls `CreateNewPart(resourceName, completionToken)`, waits for completion, then calls `StartEditingPart_Scenery`. The clone and move branches use `CloneExistingPart(s)` and `EditExistingPart(s)`. `_PositionObjects` calls `scenery_volumeextras:CalculateBestPlacementPosition`, and `_DoPlace` validates the preview before setting `bCommitChanges`. `ExitSubMode` is the deferred `CommitPreview` / `CancelPreview` boundary. `_DoDelete` destroys the edit-session move object and marks a commit.
+
+This establishes a **static scenery-specific editor call path**; runtime mod access, successful save/reload, remote replay and object ID stability remain unverified. Do not execute decompiled Lua with unresolved `PC2VEC...` string placeholders. `DraggableWidgets` handles interactive transforms, whereas `TranslationGizmo` creates temporary visual prefabs.
+
 ## Minimum proof required
 
 1. Capture a regular scenery action after mouse release and final confirmation.
