@@ -1,6 +1,6 @@
 # Co-op Anything: proposed claim issue
 
-**Status:** Prepared text only. Creation via the connected GitHub integration returned HTTP 403 on 2026-10-20; **no issue was confirmed created**.
+**Status:** Prepared text only. The submission attempt via the connected GitHub integration returned HTTP 403 (`Resource not accessible by integration`) on 2026-10-20; **no issue was confirmed created**. The connected account can read the upstream repository but the integration could not create this issue. No matching Planet Coaster issue or PR was found before submission.
 
 **Issue title:** Claim a game: Planet Coaster 2 (real-time co-op park building)
 
@@ -18,6 +18,6 @@ Research to date: game/environment manager lifecycle, PC2 Lua bytecode, editor/u
 
 ### Your repo or branch (optional)
 
-https://github.com/Conholius/planet-coaster-2-coop *(planned; not yet created)*
+https://github.com/Conholius/coaster-2-coop
 
 **Official template:** https://github.com/cranebeaker/coop-anything/issues/new?template=claim-a-game.yml
