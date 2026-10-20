@@ -6,7 +6,11 @@
 - [Cobra Tools](https://github.com/OpenNaja/cobra-tools) — Cobra-engine archive/file analysis; support for the exact PC2 target formats should be independently validated.
 - Enhanced Move Tool (PC2) — editor gizmo and transform hooks; reviewed code does **not** prove durable final placement commits.
 - ProTrack (PC2) — track-specific editor preview hooks; not direct scenery-edit proof.
-- Comparative mods from other Frontier games (ACSE, toolboxes/free-build mods) — possible patterns only; no cross-game API transfer without PC2 evidence.
+- [ACSE — Advanced Cobra Script Extender](https://github.com/OpenNaja/ACSE) — credit to OpenNaja and upstream contributors for Cobra scripting-extension work. Comparative reference; no cross-game API transfer or target-build compatibility without PC2 evidence.
+- [ForgeUtils](https://github.com/Distantz/ForgeUtils) — credit to Distantz and contributors for PC2 utility APIs, Lua/JavaScript hooks and scenery/ride builders; [upstream documentation](https://forgeutils.distantz.com). Candidate foundation, not a verified integration or proof of durable editor placement.
+- Comparative toolboxes/free-build mods from other Frontier games — possible patterns only; no cross-game API transfer without PC2 evidence.
+
+Upstream README references for ACSE and ForgeUtils were checked on 2026-10-20. See the [project credits](../../README.md#credits-and-acknowledgements) for license links and the limits of these acknowledgements.
 
 ## Technical caution
 
