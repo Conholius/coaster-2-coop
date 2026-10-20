@@ -11,7 +11,7 @@ An independent research and prospective modding project investigating real-time 
 - `ParkLoadSaveManager` delegates world save operations to the active world's `worldserialisation` interface. `LocalChangeManager` tracks local versions of online park **saves**, not granular editor mutations.
 - `api.entity.InstantiatePrefab` demonstrably creates entities, but the evidence **does not show** that arbitrary spawned entities become durable scenery placements.
 - Scenery-related specdefs describe `PlacementPartID`, resource names, transforms and serialization components, but they do not establish the editor's durable commit pathway.
-- The crucial unknown: how a normal confirmed scenery edit moves from editor preview through change list / undo into persistent park placement data.
+- **New static finding:** The game's `SubModePathSnapPlacement` source shows scenery `CreateNewPart`, editing, preview validation, and a deferred `CommitPreview` after the player confirms placement. Details: [scenery research](docs/placement/README.md). Whether a mod can reproduce this and whether the edit survives save/reload remain untested.
 
 ## Start here
 
@@ -39,6 +39,8 @@ Thank you to the authors, maintainers and contributors of these community projec
 These are credited research references and candidate foundations. This repository currently contains research notes, not an integrated co-op implementation; no runtime integration, compatibility with the target PC2 build, persistent placement or multiplayer functionality is claimed. Dependency choices remain subject to testing and license review. Our repository's license does not replace upstream licenses.
 
 References checked against the upstream repositories on 2026-10-20.
+
+- **[Frontier Modding Club Discord](https://discord.gg/Su4jXKk)** — linked by [OpenNaja's ACSE project](https://github.com/OpenNaja/ACSE). Thanks to the community for access to the prefab descriptions and API reference materials used in this research. These materials are not redistributed here.
 
 ## Collaboration
 
