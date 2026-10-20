@@ -34,13 +34,13 @@ This repository contains original research notes and, eventually, our own code, 
 Thank you to the authors, maintainers and contributors of these community projects:
 
 - **[ACSE — Advanced Cobra Script Extender](https://github.com/OpenNaja/ACSE)**, maintained in the OpenNaja repository, for expanding scripting capabilities in Frontier's Cobra-engine games and providing a valuable reference for scripting-extension research. See the [upstream README](https://github.com/OpenNaja/ACSE/blob/main/README.md) and [license](https://github.com/OpenNaja/ACSE/blob/main/LICENSE).
+- **[Cobra Tools](https://github.com/OpenNaja/cobra-tools)** by OpenNaja and contributors, for making the extraction and inspection of Cobra-engine OVL/OVS archives and associated formats significantly easier. This tooling supported the file analysis that made the project's Lua decompilation research more manageable. See the [upstream README](https://github.com/OpenNaja/cobra-tools#readme) and [documentation](https://opennaja.github.io/cobra-tools/).
 - **[ForgeUtils](https://github.com/Distantz/ForgeUtils)** by Distantz and contributors, for Planet Coaster 2 utility APIs, Lua and JavaScript hooking utilities, and custom scenery/ride builders. See the [upstream README](https://github.com/Distantz/ForgeUtils/blob/main/README.md), [documentation](https://forgeutils.distantz.com) and [license](https://github.com/Distantz/ForgeUtils/blob/main/LICENSE).
+
+- **[Frontier Modding Club Discord](https://discord.gg/Su4jXKk)** — linked by [OpenNaja's ACSE project](https://github.com/OpenNaja/ACSE). Thanks to the community for access to the prefab descriptions and API reference materials used in this research. These materials are not redistributed here.
 
 These are credited research references and candidate foundations. This repository currently contains research notes, not an integrated co-op implementation; no runtime integration, compatibility with the target PC2 build, persistent placement or multiplayer functionality is claimed. Dependency choices remain subject to testing and license review. Our repository's license does not replace upstream licenses.
 
-References checked against the upstream repositories on 2026-10-20.
-
-- **[Frontier Modding Club Discord](https://discord.gg/Su4jXKk)** — linked by [OpenNaja's ACSE project](https://github.com/OpenNaja/ACSE). Thanks to the community for access to the prefab descriptions and API reference materials used in this research. These materials are not redistributed here.
 
 ## Collaboration
 
