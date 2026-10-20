@@ -29,6 +29,17 @@ An independent research and prospective modding project investigating real-time 
 
 This repository contains original research notes and, eventually, our own code, **not** dumped game files, OVL/OVS archives, full game decompilations, asset packages, save files, keys, or other proprietary redistributions. Raw research materials belong in the ignored local workspace. Respect licenses and terms; do not bypass anti-cheat or proprietary online service protections.
 
+## Credits and acknowledgements
+
+Thank you to the authors, maintainers and contributors of these community projects:
+
+- **[ACSE — Advanced Cobra Script Extender](https://github.com/OpenNaja/ACSE)**, maintained in the OpenNaja repository, for expanding scripting capabilities in Frontier's Cobra-engine games and providing a valuable reference for scripting-extension research. See the [upstream README](https://github.com/OpenNaja/ACSE/blob/main/README.md) and [license](https://github.com/OpenNaja/ACSE/blob/main/LICENSE).
+- **[ForgeUtils](https://github.com/Distantz/ForgeUtils)** by Distantz and contributors, for Planet Coaster 2 utility APIs, Lua and JavaScript hooking utilities, and custom scenery/ride builders. See the [upstream README](https://github.com/Distantz/ForgeUtils/blob/main/README.md), [documentation](https://forgeutils.distantz.com) and [license](https://github.com/Distantz/ForgeUtils/blob/main/LICENSE).
+
+These are credited research references and candidate foundations. This repository currently contains research notes, not an integrated co-op implementation; no runtime integration, compatibility with the target PC2 build, persistent placement or multiplayer functionality is claimed. Dependency choices remain subject to testing and license review. Our repository's license does not replace upstream licenses.
+
+References checked against the upstream repositories on 2026-10-20.
+
 ## Collaboration
 
-Inspired by [Co-op Anything](https://github.com/cranebeaker/coop-anything). Its [AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md) should be reviewed before contributing. The proposed public game claim is captured in [CLAIM.md](CLAIM.md); claim submission is not yet confirmed.
+Inspired by [Co-op Anything](https://github.com/cranebeaker/coop-anything). Its [AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md) should be reviewed before contributing. The proposed public game claim is captured in [CLAIM.md](CLAIM.md); the submission attempt on 2026-10-20 returned HTTP 403 (`Resource not accessible by integration`), so no issue creation is confirmed.
