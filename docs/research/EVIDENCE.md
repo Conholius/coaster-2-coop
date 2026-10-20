@@ -15,6 +15,7 @@ These are names of locally researched materials, **not bundled source files**. T
 | Scenery components | `scenerypuppet.specdef`, `partdata.specdef`, `partdataresourcename.specdef`, scenery archives | placement part ID and resource fields | Struct definitions not runtime call traces |
 | Serialization components | `standalonesceneryserialisation.specdef`, `voxelterrainserialisation.specdef`, `guestserialisation.specdef`, `staffserialisation.specdef`, `worldserialisationtest*.specdef` | Prefab and transform references, other component data | Partial serialization schema only |
 | Mod comparisons | Enhanced Move Tool; ProTrack; Frontier modding references | Lua editing and track editor hook patterns | Cross-game methods must not be treated as PC2 proof |
+| Scenery editing (2026-10-20) | `editors.scenery.rar`, `pathsnap.lua`, `draggablewidgets.lua`, `axispositioning.lua`, `translationgizmo.lua`; original editor `.lua.bin` | `CreateUndoOperationsHierarchy`, `CreateNewPart`, `StartEditingPart_Scenery`, `StartPreview`, `CanCommitPreview`, deferred `CommitPreview`, snapping and gizmo transforms | Decompiled call sites; runtime, persistence and external mod access untested; vector placeholders remain |
 | Bytecode inspection | original `.lua.bin`, converted headers and `unluac` disassembly | PC2 Lua 5.3 custom format; conversion works for many files | Some decompilations fail despite valid disassembly |
 
 ## Selected anchors in reconstructed files
