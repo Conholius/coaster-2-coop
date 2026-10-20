@@ -12,3 +12,7 @@
 10. **Safety/versioning:** What legal/mod loader constraints, exact build versions, provenance and distribution restrictions apply?
 
 An answer requires a source reference and, for runtime claims, a recorded test. Do not mark an item solved by inference alone.
+
+## Narrowing from public source research (2026-10-20)
+
+[PC2 mod source now demonstrates the general preview/commit lifecycle](../placement/ACSE_FORGEUTILS.md), including operation-token waiting. Question 1 is narrowed to the scenery operation builder/caller and its arguments; question 2 still requires an actual save/reload experiment. ForgeUtils catalogue registration is not that missing operation. ACSE's serializer must be checked against the actual PC2 package before considering it as an alternate persistence path.
