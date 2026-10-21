@@ -41,3 +41,9 @@ This establishes a **static scenery-specific editor call path**; runtime mod acc
 ## ACSE / ForgeUtils follow-up (2026-10-20)
 
 [Source-pinned investigation](ACSE_FORGEUTILS.md) distinguishes catalogue registration from placed instances and identifies a PC2 track mod's concrete preview/commit lifecycle. The scenery-specific creation arguments and save/reload proof remain unresolved.
+
+## Runtime update — editor presence confirmed (2026-10-21)
+
+Diagnostic **006** in the copied PC2 test installation **outside Sandboxie** successfully read `worldAPIs.editors` in active `tropicalworld` and found `CreateUndoOperationsHierarchy` plus `api.undo.PreviewChangeList`, `CanCommitPreview`, `CommitPreview` and `CancelPreview` as functions. The minimal world component with a `Shutdown()` handler also survived the menu-to-park transition.
+
+**Boundary:** These are **method-presence checks**, not successful invocation, preview, commit or persistence. The **next planned** diagnostic 007 is to call `editors:CreateUndoOperationsHierarchy()` and inspect the returned hierarchy without adding edits. See [runtime experiment record](../testing/RUNTIME_TESTS.md#next-experiment-diagnostic-007).

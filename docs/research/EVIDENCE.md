@@ -31,12 +31,23 @@ These are names of locally researched materials, **not bundled source files**. T
 
 See [ACSE / ForgeUtils investigation](../placement/ACSE_FORGEUTILS.md) for commit-pinned source references and function-level anchors. ForgeUtils catalogue registration, its Lua hooks, ACSE's tracked-entity serializer and PC-CC's track preview/commit implementation were inspected. These are static source observations; none establishes PC2 scenery save/reload persistence.
 
-## Runtime evidence added 2026-10-21 (private test logs)
+## Runtime evidence (2026-10-21; private PC2 logs)
 
-| Test | Version/context | What the log establishes | Limitations |
-| --- | --- | --- | --- |
-| Custom mod startup + logging | PC2 1.11.4.1011357; ACSE 0.729; ACSEDebug 0.014; ForgeUtils 2.7.0 | `PC2CoopDiagnostics.LuaDB.Init` executed; `api.debug.Trace` captured in `Planet Coaster 2.log`; ForgeUtils `hookmanager` module loaded and `AddHook` present | ACSEDebug binary intended for another Frontier game; provenance not fully independently confirmed; no hook execution tested |
-| Custom component enabled, park transition crash | Same environment; `LuaDB.AddLuaComponents` registers `PC2CoopDiagnosticComponent` | component `Configure`, `Init`, menu-world `OnWorldActivation` ran; editor/undo **presence** checks passed; crash after menu-world shutdown during new tropical park load | No exception/stack trace; no park-world API test; missing `Shutdown` not proven causal |
-| Component disabled, successful control | Same environment **including ACSEDebug 0.014**, rebuilt `Main.ovl` with `AddLuaComponents` registration disabled | tropical sandbox world loaded, UI entered scenery-placement workflow, remained stable >60 seconds, and shut down normally | Debug menu not opened; cannot generalize native debug functionality or prove whole-game stability |
+All successful 005/006 sessions in the following table used a **copied game installation outside Sandboxie**, as confirmed by the tester. Do not imply the runs were inside the separately configured Sandboxie host.
 
-Original logs: `Planet Coaster 2.log` (baseline), `Planet Coaster 2(1).log` (component enabled / crash), `Planet Coaster 2(2).log` (component disabled / success). These logs and game files are **not stored in the public repository**. The runtime log reports the PC2 build; original executable and OVL checksums remain to be collected privately.
+| Test / source | Verified in a running game | Not established |
+| --- | --- | --- |
+| Baseline diagnostics; `Planet Coaster 2.log` | ACSE `0.729`, ACSEDebug `0.014`, ForgeUtils `2.7.0`; `LuaDB.Init` and `api.debug.Trace` work; `forgeutils.hookmanager` can be required and has an `AddHook` function | No hook execution or cross-game debug GUI compatibility |
+| Original crash; `Planet Coaster 2(1).log` | Custom component registers, initializes and probes menu-world API presence; crash/termination around old-world shutdown during attempted park transition | Native crash cause; cannot attribute it solely to missing `Shutdown` |
+| Component-disabled control; `Planet Coaster 2(2).log` | With custom component registration disabled but ACSEDebug enabled, a tropical park loads, stays up over 60 seconds and exits normally | Cannot isolate which custom component feature caused initial crash |
+| Stale-package runs; `Planet Coaster 2(3).log`, `(4).log` | Diagnostic `LuaDB.Init` ran, park loaded; **the custom component was not registered** | Not evidence of minimal-component safety |
+| **Diagnostic 005; `Planet Coaster 2(5).log`** | `VERSION TEST 005` appeared; custom component registered; `Configure`, `Init` and menu activation executed | Park-world lifecycle not yet tested in that log |
+| **Minimal component park transition; `Planet Coaster 2(6).log`** | Old world deactivation and `Shutdown`; component recreated and activated in `tropicalworld`; park loaded and exited; screen-mode change logged | `Shutdown` alone not isolated as root-cause fix |
+| **Diagnostic 006; `Planet Coaster 2(7).log`** | In `tropicalworld`, `GetWorldAPIs` succeeded; `editors` and `api.undo` accessible; `CreateUndoOperationsHierarchy`, `PreviewChangeList`, `CanCommitPreview`, `CommitPreview`, `CancelPreview` present as functions; park ran and exited normally | **No** undo hierarchy created, no edit executed, no commit, no saved placement |
+| **Diagnostic 007 (planned)** | **No runtime result supplied** | Actual creation of an undo hierarchy and returned methods |
+
+The detailed experiment matrix is [runtime tests](../testing/RUNTIME_TESTS.md). Original logs are **private and not stored in GitHub**; source paths, user names, dumps, save files and binary packages remain in local evidence storage. Build **1.11.4.1011357** is game/log-reported; executable and OVL SHA-256 values are not recorded in these public notes.
+
+## Separate local Sandboxie setup (not the above runtime runs)
+
+The project setup notes describe `PC2CoopHost` and an unvalidated `PC2CoopGuest`, file-redirection rules, and a startup configuration with `UnstrippedToken=y` allowing a main-menu launch in the host. This is a **reported setup / past startup observation**, not proof that 005/006 were executed in Sandboxie, that the guest launches, that Steam Cloud is fully isolated, or that Denuvo caused the original failure. See [translated setup notes](../ISOLATED-INSTALLATION.md).

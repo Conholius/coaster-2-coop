@@ -1,5 +1,7 @@
 # First prototype: proof of persistent scenery replication
 
+> **Status update — 2026-10-21:** A custom ACSE component and editor/undo API **presence** checks work in a real PC2 park (diagnostics 005/006, copied installation outside Sandboxie). **Diagnostic 007 (hierarchy invocation), first committed scenery part, save/reload, and two-client replication are not yet tested.** See [runtime tests](../testing/RUNTIME_TESTS.md).
+
 ## Goal
 
 With two isolated PC2 clients on matching exact builds and independently loaded matching park baselines, reproduce a **confirmed** placement of one ordinary decoration prop on the second client and verify the result persists after a save/reload. This is a **plan**, not a completed test.

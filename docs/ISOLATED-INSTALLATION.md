@@ -37,3 +37,11 @@ The old directories were not deleted. **If this project folder is moved, its abs
 This configuration prioritizes compatibility while retaining selected filesystem restrictions. `UnstrippedToken=y` weakens an aspect of process isolation; do not present the sandbox as a security boundary with complete coverage. The observed startup improvement does **not** establish that Denuvo Anti-Tamper caused the original failure, or that the configuration bypasses Denuvo. Preserve backups and avoid running experiments against the regular profile.
 
 This document describes the user's local setup and reported tests. It intentionally excludes personally identifying absolute paths, log files, binaries, credentials, and proprietary game content.
+
+## Relationship to later editor diagnostics (2026-10-21)
+
+**Important:** The later successful diagnostic 005/006 sessions used the copied `test-install` but **were not launched inside Sandboxie**. The tester noticed this after those sessions. Therefore the observed custom-component lifecycle and editor API method-presence results are valid for the copied installation but **have not been repeated under the configured Sandboxie host**.
+
+The archived launch scripts may restore a previous baseline mod or change `Mod_Degridded/Main.ovl`; **inspect them before reusing them for new diagnostics** so that the intended `PC2CoopDiagnostics/Main.ovl` is not replaced or bypassed. The file `Planet Coaster 2 - Isoliert.cmd` belongs to the original setup and is not itself proof that a newly-built diagnostic mod was loaded.
+
+See [runtime test matrix](testing/RUNTIME_TESTS.md) for the strict separation of confirmed game observations and planned test 007.

@@ -75,3 +75,9 @@ The supplied local evidence collection has now been inspected: 318 files and fiv
 The earlier statement that scenery creation and commit call sites were missing is superseded by later user-provided decompiled PC2 editor files. `Editors.Scenery.SubModePathSnapPlacement:BeginSubMode` creates an undo hierarchy and begins preview; `_CreateMoveObject_NewInstance` calls `CreateNewPart`, waits for entity completion, then calls `StartEditingPart_Scenery`. The mode also calls `EditExistingPart(s)` and `CloneExistingPart(s)`. `_DoPlace` validates and sets `bCommitChanges`; `ExitSubMode` performs the deferred `CommitPreview` or cancellation. The new local scenery archive contains a brush-placement creation/preview/commit path as well. See [scenery placement research](README.md) and [evidence index](../research/EVIDENCE.md).
 
 **The remaining blocker has changed:** verify that an ACSE/ForgeUtils mod can use or observe these calls on the target build and that resulting scenery survives save/reload. The recovered editor Lua still contains temporary vector-string placeholders and is not suitable for direct execution. This update does not establish actual multiplayer functionality.
+
+## Later runtime update (2026-10-21)
+
+The original investigation above is **static source research**. Subsequent PC2 diagnostic **006** showed that the editor/undo API names are accessible in `tropicalworld`, and a minimal custom ACSE world component survives the park transition in a copied test installation **outside Sandboxie**. **No call to `CreateUndoOperationsHierarchy()`, editor preview, commit or save/reload occurred in those diagnostics.** Diagnostic **007**, the first planned hierarchy-construction call, remains **unrun**.
+
+For reproducible results and the historical failed component test, consult [runtime tests](../testing/RUNTIME_TESTS.md) and [current status](../research/STATUS.md).

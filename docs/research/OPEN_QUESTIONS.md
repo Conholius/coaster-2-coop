@@ -1,24 +1,34 @@
-# Open questions (priority order)
+# Open questions and next experiments
 
-1. **Durable editor commit:** The scenery editor pathway is now visible in `SubModePathSnapPlacement` and brush placement. Can we verify its complete arguments and completion ordering, and expose the same confirmed commit operations through a permitted mod?
-2. **Reproducible placement:** Can a permitted mod invoke the exact operation in a running retail build and does the result survive save/reload?
-3. **Change detection:** Where can we observe only user-confirmed edits rather than previews, transient transforms or drag updates?
-4. **Identifier translation:** How are EntityID, PlacementID, PlacementPartID and saved IDs assigned, mapped and replaced when actions are replayed across different clients?
-5. **World serialization implementation:** Which native or scripted module provides `api.world.GetWorldAPIs().worldserialisation`? Is it reachable for loaded-park inspection?
-6. **Park environment:** Which modules and managers are registered in the active park-specific world environment?
-7. **Logical module resolution:** How does `loadresource("Editors.Scenery.SceneryEditMode")` map to actual packaged OVL/OVS resources?
-8. **Session baseline:** Can identical initial park state be loaded independently and hashes/placement inventories compared?
-9. **Network authority:** Which operation validation, order, conflict handling, retransmission and resynchronization model works without corrupting a park?
-10. **Safety/versioning:** What legal/mod loader constraints, exact build versions, provenance and distribution restrictions apply?
+[← Current status](STATUS.md) · [Runtime tests](../testing/RUNTIME_TESTS.md) · [Prototype plan](../prototype/PLAN.md)
 
-An answer requires a source reference and, for runtime claims, a recorded test. Do not mark an item solved by inference alone.
+**Prioritized as of 2026-10-21.** A method that **exists** in a Lua API has not necessarily been **called**, and a successful call is not proof of persistence.
 
-## Narrowing from public source research (2026-10-20)
+## Immediate blockers
 
-[PC2 mod source now demonstrates the general preview/commit lifecycle](../placement/ACSE_FORGEUTILS.md), including operation-token waiting. Additional PC2 scenery editor Lua now supplies concrete scenery creation/edit/clone and deferred commit call sites. Question 1 is narrowed to runtime invocation and reliable event interception. Question 2 still requires save/reload tests. ForgeUtils catalogue registration is not that missing operation. ACSE's serializer must be checked against the actual PC2 package before considering it as an alternate persistence path.
+1. **Diagnostic 007 — hierarchy invocation:** Can our ACSE component in `tropicalworld` execute `editors:CreateUndoOperationsHierarchy()`, receive a valid hierarchy and inspect its methods without destabilizing a world transition? **Not tested.**
+2. **Exact scenery edit arguments:** Which base-game scenery resource and parameters does `CreateNewPart` require, how are completion tokens awaited, and which coordinate/ID types does the editor use? Static call sites are known, not yet confirmed by a runtime edit trace.
+3. **Durable edit:** Can a single, user-authorized scenery change go through preview, commit, save, exit and reload without duplicates? **No evidence yet.**
+4. **Confirmed-change capture:** Where can we observe *committed* edits rather than transient previews or gizmo movement?
+5. **Identity mapping:** How do `EntityID`, `PlacementID`, `PlacementPartID`, saved IDs and mod-defined network IDs relate across reload and clients?
 
-## Runtime diagnostics / component lifecycle (2026-10-21)
+## Next phase after persistence
 
-- **ACSEDebug compatibility:** A cross-game ACSEDebug 0.014 package successfully logged from PC2 1.11.4.1011357 with ACSE 0.729, but are its debug menu and native helpers safe? **Unknown; avoid debug UI.** Exact installed cross-game package provenance and hashes are not yet independently documented. Do not recommend unconditional installation.
-- **Custom component park-transition crash:** Why does the PC2CoopDiagnosticComponent registered with `AddLuaComponents` crash during `startscreenglobe -> tropicalworld`? A successful control disabled that registration while keeping ACSEDebug present. Investigate expected `Shutdown`, `OnWorldDeactivation`, recreation and manager registration contracts, without assuming one missing callback caused the crash.
-- **Editor presence vs invocation:** Editor / undo methods existed during `startscreenglobe` activation; are these APIs also safely callable after the actual `tropicalworld` has activated? Currently **untested**.
+6. **World serialization:** Which implementation backs the park world's `worldserialisation` API, and how can we compare lasting placement state?
+7. **Two-client baseline:** Can two separately authorized clients load identical base parks and compare canonical inventories while keeping Steam/profile and save boundaries isolated?
+8. **Replication protocol:** Which ordering, validation, authority, retry and rollback model reproduces the same scene without conflicts or corruption?
+9. **Version and distribution:** Which exact game/ACSE build hashes and licensing or launcher constraints apply to a reproducible package?
+
+## Environment and safety uncertainties
+
+- **Sandboxie:** A separate `PC2CoopHost` setup has previously reached the menu with `UnstrippedToken=y`, but the **successful 005/006 editor sessions were run outside Sandboxie**. Can the same diagnostic and later controlled edits be reproduced in the sandbox? Does the guest launch independently? **Unknown.**
+- **Earlier world-transition crash:** Minimal component with `Shutdown()` and removed probes works; was the original failure caused by the missing callback, unsafe probing, or their interaction? **Not isolated.**
+- **ACSEDebug:** Cross-game logging works; provenance, debug menu and native safety are unverified. Avoid the GUI.
+- **Denuvo attribution:** The observed Sandboxie startup improvement does not prove the failure was caused by Denuvo or that `UnstrippedToken=y` bypasses anti-tamper.
+
+## Recently answered (limited scope)
+
+- **Can a custom ACSE component survive `startscreenglobe → tropicalworld`?** Yes, in the copied PC2 test installation, diagnostic 005 + park transition.
+- **Are editor and undo APIs present in a loaded park?** Yes, diagnostic 006 returned `true` for the specified method-presence checks in `tropicalworld`. **Invoking those methods remains untested.**
+
+Historical open questions and chronology are preserved in [LOG.md](LOG.md). Each newly answered question needs an actual runtime log or source anchor, with explicit limitations.

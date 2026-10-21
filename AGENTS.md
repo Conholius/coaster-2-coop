@@ -1,6 +1,6 @@
 # Agent instructions — Planet Coaster 2 co-op
 
-Before working, read `README.md`, `docs/research/STATUS.md`, `docs/research/EVIDENCE.md`, and `docs/research/OPEN_QUESTIONS.md`, then the relevant subsystem document. Also read the upstream [Co-op Anything AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md), and follow its applicable safety, ownership and QA rules.
+Before working, read `README.md`, `docs/README.md`, `docs/research/STATUS.md`, `docs/testing/RUNTIME_TESTS.md`, `docs/research/EVIDENCE.md`, and `docs/research/OPEN_QUESTIONS.md`, then the relevant subsystem document. The chronological `LOG.md` retains superseded failures; do not promote them back into the current status. Also read the upstream [Co-op Anything AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md), and follow its applicable safety, ownership and QA rules.
 
 ## Non-negotiable evidence rules
 
@@ -17,7 +17,7 @@ Before working, read `README.md`, `docs/research/STATUS.md`, `docs/research/EVID
 
 ## First engineering objective
 
-Trace a single **user-confirmed** scenery edit from preview/editor transforms through `UndoOperationsHierarchy` or a related commit pathway into durable placement state; repeat via authorized Lua tooling on a separate test save, save/reload, then attempt replication. Start with a single decoration prop, not tracks, guests, terrain, or economic state.
+After the planned diagnostic 007 hierarchy-invocation test, trace a single **user-confirmed** scenery edit from preview/editor transforms through `UndoOperationsHierarchy` or a related commit pathway into durable placement state; repeat via authorized Lua tooling on a separate test save, save/reload, then attempt replication. Start with a single decoration prop, not tracks, guests, terrain, or economic state.
 
 ## Notes and contribution workflow
 
