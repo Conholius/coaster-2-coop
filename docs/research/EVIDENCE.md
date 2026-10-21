@@ -30,3 +30,13 @@ These are names of locally researched materials, **not bundled source files**. T
 ## Public source follow-up (2026-10-20)
 
 See [ACSE / ForgeUtils investigation](../placement/ACSE_FORGEUTILS.md) for commit-pinned source references and function-level anchors. ForgeUtils catalogue registration, its Lua hooks, ACSE's tracked-entity serializer and PC-CC's track preview/commit implementation were inspected. These are static source observations; none establishes PC2 scenery save/reload persistence.
+
+## Runtime evidence added 2026-10-21 (private test logs)
+
+| Test | Version/context | What the log establishes | Limitations |
+| --- | --- | --- | --- |
+| Custom mod startup + logging | PC2 1.11.4.1011357; ACSE 0.729; ACSEDebug 0.014; ForgeUtils 2.7.0 | `PC2CoopDiagnostics.LuaDB.Init` executed; `api.debug.Trace` captured in `Planet Coaster 2.log`; ForgeUtils `hookmanager` module loaded and `AddHook` present | ACSEDebug binary intended for another Frontier game; provenance not fully independently confirmed; no hook execution tested |
+| Custom component enabled, park transition crash | Same environment; `LuaDB.AddLuaComponents` registers `PC2CoopDiagnosticComponent` | component `Configure`, `Init`, menu-world `OnWorldActivation` ran; editor/undo **presence** checks passed; crash after menu-world shutdown during new tropical park load | No exception/stack trace; no park-world API test; missing `Shutdown` not proven causal |
+| Component disabled, successful control | Same environment **including ACSEDebug 0.014**, rebuilt `Main.ovl` with `AddLuaComponents` registration disabled | tropical sandbox world loaded, UI entered scenery-placement workflow, remained stable >60 seconds, and shut down normally | Debug menu not opened; cannot generalize native debug functionality or prove whole-game stability |
+
+Original logs: `Planet Coaster 2.log` (baseline), `Planet Coaster 2(1).log` (component enabled / crash), `Planet Coaster 2(2).log` (component disabled / success). These logs and game files are **not stored in the public repository**. The runtime log reports the PC2 build; original executable and OVL checksums remain to be collected privately.
