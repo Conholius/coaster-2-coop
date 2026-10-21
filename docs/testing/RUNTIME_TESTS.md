@@ -1,4 +1,4 @@
-# Runtime tests — PC2 world lifecycle and editor interface
+# Runtime tests — PC2 lifecycle, scenery and transport capability
 
 [← Documentation guide](../README.md) · [Current status](../research/STATUS.md) · [Scenery research](../placement/README.md)
 
@@ -28,7 +28,7 @@ The existence of an already configured Sandboxie `PC2CoopHost` environment is a 
 | **Diagnostic 005 — `Planet Coaster 2(5).log`** | Added `VERSION TEST 005`; rebuilt/copied the correct `Main.ovl`; registered minimal component with `Shutdown()` | New version marker, registration, `Configure`, `Init`, and `OnWorldActivation` appeared in menu world | Confirmed packaging and basic component lifecycle. |
 | **Lifecycle / park transition — `Planet Coaster 2(6).log`** | Continued with the registered minimal component | Menu-world `OnWorldDeactivation` and `Shutdown`; new component registered/configured/initialized in park; `tropicalworld` activated; park completed load and normal exit | **Successful** park-world component lifecycle. Tester also changed screen mode while running. |
 | **Diagnostic 006 — `Planet Coaster 2(7).log`** | Added guarded, presence-only checks on world activation | In `tropicalworld`: `GetWorldAPIs` succeeded; `editors` accessible; `CreateUndoOperationsHierarchy` and four `api.undo` methods present as functions. Park finished loading and later deactivated normally. | **Successful API presence test**, not a method-invocation or scenery-edit test. |
-| **Diagnostic 007** | Proposed `editors:CreateUndoOperationsHierarchy()` plus result/type/method inspection | **Not run; no log supplied.** | Next planned experiment; do not mark as passing. |
+| **Diagnostic 007** | Invoked hierarchy construction in the park | Returned hierarchy used successfully in subsequent tests | Passed; historical planned status superseded. |
 
 ### Key runtime checkpoint: diagnostic 006
 
@@ -49,35 +49,42 @@ In the active `tropicalworld`, the log reports:
 
 These entries are **presence checks only**. `pcall()` around a Lua call is not a guarantee against a native engine crash.
 
-## Next experiment: diagnostic 007
+## Diagnostics 007–034: later runtime results
 
-**Goal:** from our own ACSE world component in `tropicalworld`, call:
+The detailed [diagnostic ledger](../research/DIAGNOSTICS_007_034.md) records each step and its limits. These owner-run tests are not a two-client automated QA suite.
 
-```lua
-local hierarchy = editors:CreateUndoOperationsHierarchy()
-```
+| Range | Result |
+| --- | --- |
+| 007–013 | Hierarchy/change list, CreateNewPart, StartEditingPart_Scenery, transform reads and reversible cross-Advance movement |
+| 014–018 | Completed preview, cancellation, committability, one commit and world-instance verification |
+| 019–022 | Creation and existing-part movement persisted through new local saves and manual verify-only reloads |
+| 023–025 | Deletion preview restored on cancellation; committed deletion persisted after save/reload |
+| 026–027 | Two equal-resource rocks addressed independently by own keys/local IDs |
+| 028 | Eight commands, four duplicate skips, four commits |
+| 029 | Four order errors and four ID conflicts rejected; four valid commits |
+| 030 | A/B separate runs: 120 matching canonical STATE records, covering all twelve inputs |
+| 031 | io/os/LuaSocket unavailable; file/socket tests skipped; loadlib present but untested |
+| 032–034 | Raw enumeration incomplete; five normal-access controls function; nine invented names nil |
 
-**Only after confirming the expected world and editor interface:** record whether the call succeeded, the returned value/type, and the **presence** of hierarchy methods such as `GetFullUndoChangeList`, `CreateNewPart`, `CreateNewParts`, `EditExistingPart`, `CloneExistingPart`. Do **not** call creation/editing methods, begin a preview, or commit.
+### Retained evidence rechecked during this update
 
-The method-call pattern appears in [PC-CC's PC2 importer source](https://github.com/parker02311/PC-CC/blob/e722a387d407e532d0c6be914a97b7a0121f21b7/Mod_Importer/Main/Managers/Mod_Importer.UIManager.lua), but compatibility of this call with **our** component is still **unverified**.
+- 022 Phase 1: CommitPreview call count 1, operation completed, save returned success; Phase 2 checks the loaded part/resource/position without mutation.
+- 025 Phase 1: one completed deletion commit and successful save; Phase 2 checks absent part and mappings.
+- 030 A/B: twelve verified snapshots, each ending with four applied and eight rejected inputs; canonical comparison excludes instance labels/timestamps and local IDs.
+- 034: checked=14, controlFunctions=5/5, inventedFunctions=0/9, inventedNil=9, failedOrSkipped=0, Completed=true.
 
-**Suggested procedure:**
+No tests were rerun in the game for this documentation update. Earlier results are consolidated from prior private log reviews; retained selected logs were reread.
 
-1. Back up the working diagnostic 006 `Main.ovl` and the disposable test park.
-2. Verify which **copied install** and which **sandbox / Steam context** will run. Do not substitute an older launcher that restores baseline mods without inspecting it; review [Sandboxie notes](../ISOLATED-INSTALLATION.md).
-3. Rebuild from the intended `Main` source using Cobra Tools, with `Flatten Lua Subfolders`, and copy the new `Main.ovl` to the diagnostic mod in the copied installation.
-4. Start PC2; verify the version marker and custom component registration in the fresh log.
-5. Load a **new empty test park**, wait approximately 60 seconds, exit normally and inspect the log.
-6. If stable, record results and only then plan `GetFullUndoChangeList()` and controlled scenery operations.
+## Next experiment: transport without game edits
 
-**Pass condition:** hierarchy creation reported success in `tropicalworld` **and** the game safely transitions and exits. **Failure condition:** error, nil hierarchy, hang or crash; retain the relevant private log and roll back to diagnostic 006.
+Establish exact HTTP constructor and response semantics before a native request. The initial transport test should send a harmless message to an owner-controlled endpoint and read an acknowledgement, with no editor, commit or save calls. This test has **not run**. [Investigation](../networking/TRANSPORT.md).
 
 ## Not demonstrated
 
-- No runtime mod call creating scenery, `PreviewChangeList()`, `CommitPreview()`, or scenery operation token flow.
-- No confirmation that a created object is selectable/editable as a normal park part.
-- No save/reload persistence, no second independent client, no replication and no playable co-op.
-- No proof that Sandboxie isolates all Steam/Cloud/user-profile activity or that Denuvo caused the previous sandbox startup failure.
+- Simultaneous independent clients, message transport or live co-op.
+- Ordinary user-edit capture, general undo/redo, crash/reconnect recovery or persistent deduplication.
+- Complete Steam/Cloud isolation, a working second sandboxed client, or a Denuvo root cause.
+- Applicability beyond the tested base-game rock and local save workflow.
 
 ## Evidence handling
 

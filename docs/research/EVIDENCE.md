@@ -1,6 +1,6 @@
 # Evidence index
 
-These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable.
+These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 034 are indexed in the later section and in [STATUS.md](STATUS.md).
 
 | Area | Local source material | Confirmed symbols/observations | Qualification |
 | --- | --- | --- | --- |
@@ -44,10 +44,31 @@ All successful 005/006 sessions in the following table used a **copied game inst
 | **Diagnostic 005; `Planet Coaster 2(5).log`** | `VERSION TEST 005` appeared; custom component registered; `Configure`, `Init` and menu activation executed | Park-world lifecycle not yet tested in that log |
 | **Minimal component park transition; `Planet Coaster 2(6).log`** | Old world deactivation and `Shutdown`; component recreated and activated in `tropicalworld`; park loaded and exited; screen-mode change logged | `Shutdown` alone not isolated as root-cause fix |
 | **Diagnostic 006; `Planet Coaster 2(7).log`** | In `tropicalworld`, `GetWorldAPIs` succeeded; `editors` and `api.undo` accessible; `CreateUndoOperationsHierarchy`, `PreviewChangeList`, `CanCommitPreview`, `CommitPreview`, `CancelPreview` present as functions; park ran and exited normally | **No** undo hierarchy created, no edit executed, no commit, no saved placement |
-| **Diagnostic 007 (planned)** | **No runtime result supplied** | Actual creation of an undo hierarchy and returned methods |
+| **Diagnostic 007 (later passed)** | Hierarchy construction and subsequent use confirmed in later private log reviews | See the consolidated 007–034 record below |
 
 The detailed experiment matrix is [runtime tests](../testing/RUNTIME_TESTS.md). Original logs are **private and not stored in GitHub**; source paths, user names, dumps, save files and binary packages remain in local evidence storage. Build **1.11.4.1011357** is game/log-reported; executable and OVL SHA-256 values are not recorded in these public notes.
 
 ## Separate local Sandboxie setup (not the above runtime runs)
 
 The project setup notes describe `PC2CoopHost` and an unvalidated `PC2CoopGuest`, file-redirection rules, and a startup configuration with `UnstrippedToken=y` allowing a main-menu launch in the host. This is a **reported setup / past startup observation**, not proof that 005/006 were executed in Sandboxie, that the guest launches, that Steam Cloud is fully isolated, or that Denuvo caused the original failure. See [translated setup notes](../ISOLATED-INSTALLATION.md).
+
+## Later runtime evidence — diagnostics 007–034
+
+The [detailed ledger](DIAGNOSTICS_007_034.md) distinguishes original test outcomes from this update's rereads. Older standalone logs are not all retained in the currently available backup folders; their conclusions are consolidated from the earlier research conversation and log reviews, not represented as newly repeated tests.
+
+| Evidence anchor | Finding | Limit |
+| --- | --- | --- |
+| Prior private log reviews 007–018 | Hierarchy/create/edit/transform, preview/cancel/commit and world-position checks | One scenery resource and controlled scripted tests |
+| 019 Phase 1 and prior Phase 2 review | New local save; AQ_Rock_04 / part 1182 at (10,5,10) after reload | One park's part ID |
+| Retained 022 Phase 1/2 logs | One move commit, successful save, stable loaded resource/position (15,5,10) | Not cross-client mapping |
+| Retained 025 Phase 1/2 logs | One delete commit, successful save, absent part/entity mappings after reload | Tested save only |
+| Prior reviews 026–029 | Independent equal-resource parts; duplicate/order/ID-conflict checks | In-memory session state, not crash-safe exactly-once |
+| Retained 030 A/B logs | Twelve snapshots / 120 canonical STATE records per run matched; four commits | Separate local runs; no network |
+| Prior reviews 031–033 | io/os/socket unavailable; raw API enumeration incomplete; five candidate fields function | No free URL / response / bridge proof |
+| Current 034 log | Five controls function, nine invented fields nil; checked 14, failures 0, completed true | No candidate function invoked |
+| Original FrontierAccountManager bytecode and full private disassembly | 135 prototypes including main; RunKeplerRequest call corroborated at original line 1772 | No CreateKeplerHttpRequest call found |
+| Complete private --nodebug decompile | 134 declarations plus main through file end; synthetic local names | Not runtime-equivalence proof |
+
+Source/function anchors for the workshop, account, newsfeed, WebRequestManager and online-session investigation are in [TRANSPORT.md](../networking/TRANSPORT.md). Static findings and function existence must not be promoted to executed transport.
+
+The first 005/006 records retain their outside-Sandboxie qualification. Later log paths do not independently establish process isolation. No raw logs, decompiled scripts or private Windows paths are committed.

@@ -17,7 +17,7 @@ Before working, read `README.md`, `docs/README.md`, `docs/research/STATUS.md`, `
 
 ## First engineering objective
 
-After the planned diagnostic 007 hierarchy-invocation test, trace a single **user-confirmed** scenery edit from preview/editor transforms through `UndoOperationsHierarchy` or a related commit pathway into durable placement state; repeat via authorized Lua tooling on a separate test save, save/reload, then attempt replication. Start with a single decoration prop, not tracks, guests, terrain, or economic state.
+Diagnostics 007–034 have established scripted AQ_Rock_04 create/move/delete, local save/reload and session-local guarded replay. Read `docs/research/DIAGNOSTICS_007_034.md` and `docs/networking/TRANSPORT.md` before proposing the next test. Current objective: establish a supported harmless message/ack transport, then replay a validated scenery command across two actual clients. Confirmed player-edit capture, cross-client identity and durable recovery remain unproven. Do not repeat hierarchy invocation as an untested milestone or call separate A/B replay runs network synchronization.
 
 ## Notes and contribution workflow
 

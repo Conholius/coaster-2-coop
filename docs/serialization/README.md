@@ -20,3 +20,11 @@ A save request is initiated and completion polled asynchronously using Lua corou
 - `worldserialisationtest*.specdef`: small test component definitions, including a test with primitive string/u32/u64/float fields.
 
 Component schemas **do not establish** the complete save schema, how objects receive persistent IDs, or how loaded park parts are reconstructed. Never infer the format of a live network message directly from these partial component declarations.
+
+## Runtime persistence — diagnostics 019, 022 and 025
+
+The own Lua diagnostic created AQ_Rock_04, saved a new local park and found the same test part 1182/resource at (10,5,10) after manual reload. A later move to (15,5,10) persisted in 022. Deletion and absent entity mappings persisted in 025. Each verification used a separate verify-only code phase, without recreating or reapplying the action.
+
+The tested manager path obtains Interfaces.IParkLoadSaveManager through the game environment, calls GenerateCurrentParkMetaData and SaveParkToSaveToken with the game owner plus a new local save descriptor, waits for completion and api.save.IsBusy() to clear, and checks the returned token/name. An undo Checkpoint is separate from a park save.
+
+[Diagnostic ledger and limits](../research/DIAGNOSTICS_007_034.md). This proves the tested scenery effects survive these local saves, not the full serializer format or persistent mod-owned network-ID metadata. Full Steam Cloud isolation, cross-client IDs and general persistence remain open.

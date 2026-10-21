@@ -26,7 +26,7 @@ Enhanced Move Tool hooks scene draggable widgets and reads/manipulates transform
 
 The new local evidence is `Editors.Scenery.SubModePathSnapPlacement` (`pathsnap.lua`) and `editors.scenery.brushplacement_unluac.lua` from the scenery archive. In `SubModePathSnapPlacement`, `BeginSubMode` creates an undo hierarchy and starts a preview; `_CreateMoveObject_NewInstance` calls `CreateNewPart(resourceName, completionToken)`, waits for completion, then calls `StartEditingPart_Scenery`. The clone and move branches use `CloneExistingPart(s)` and `EditExistingPart(s)`. `_PositionObjects` calls `scenery_volumeextras:CalculateBestPlacementPosition`, and `_DoPlace` validates the preview before setting `bCommitChanges`. `ExitSubMode` is the deferred `CommitPreview` / `CancelPreview` boundary. `_DoDelete` destroys the edit-session move object and marks a commit.
 
-This establishes a **static scenery-specific editor call path**; runtime mod access, successful save/reload, remote replay and object ID stability remain unverified. Do not execute decompiled Lua with unresolved `PC2VEC...` string placeholders. `DraggableWidgets` handles interactive transforms, whereas `TranslationGizmo` creates temporary visual prefabs.
+This section records the earlier **static scenery-specific editor call path**. Later runtime diagnostics below established the tested create/move/delete and local save/reload path; remote replay and cross-client identity remain unverified. Do not execute decompiled Lua with unresolved `PC2VEC...` string placeholders. `DraggableWidgets` handles interactive transforms, whereas `TranslationGizmo` creates temporary visual prefabs.
 
 ## Minimum proof required
 
@@ -36,14 +36,20 @@ This establishes a **static scenery-specific editor call path**; runtime mod acc
 4. Save and reload; verify the object, transform and placement inventory remain correct.
 5. Repeat with move/delete; test undo and redo semantics.
 
-**Not yet demonstrated.**
+**Updated:** scripted create/move/delete and local persistence are now demonstrated for AQ_Rock_04 (009–025). Capturing ordinary player-confirmed edits and full undo/redo remain unverified.
 
 ## ACSE / ForgeUtils follow-up (2026-10-20)
 
-[Source-pinned investigation](ACSE_FORGEUTILS.md) distinguishes catalogue registration from placed instances and identifies a PC2 track mod's concrete preview/commit lifecycle. The scenery-specific creation arguments and save/reload proof remain unresolved.
+[Source-pinned investigation](ACSE_FORGEUTILS.md) distinguishes catalogue registration from placed instances and identifies a PC2 track mod's concrete preview/commit lifecycle. That investigation predates the runtime creation and persistence evidence below.
 
 ## Runtime update — editor presence confirmed (2026-10-21)
 
 Diagnostic **006** in the copied PC2 test installation **outside Sandboxie** successfully read `worldAPIs.editors` in active `tropicalworld` and found `CreateUndoOperationsHierarchy` plus `api.undo.PreviewChangeList`, `CanCommitPreview`, `CommitPreview` and `CancelPreview` as functions. The minimal world component with a `Shutdown()` handler also survived the menu-to-park transition.
 
-**Boundary:** These are **method-presence checks**, not successful invocation, preview, commit or persistence. The **next planned** diagnostic 007 is to call `editors:CreateUndoOperationsHierarchy()` and inspect the returned hierarchy without adding edits. See [runtime experiment record](../testing/RUNTIME_TESTS.md#next-experiment-diagnostic-007).
+**Historical boundary:** 006 itself was presence-only. The later diagnostics supersede its planned-007 status.
+
+## Runtime update — creation, movement, deletion and persistence
+
+Diagnostics 007–025 successfully exercised hierarchy/change-list construction, AQ_Rock_04 creation, StartEditingPart_Scenery, transform changes, completed preview/cancel/commit, local save and verify-only manual reload. The test part 1182 persisted at (10,5,10), later at (15,5,10), and was absent after saved deletion. 026–030 added independent equal-resource objects and guarded ordered command replay.
+
+See the [full lifecycle, exact tested signatures and limitations](../research/DIAGNOSTICS_007_034.md). Part IDs in that record belong to one test park; entity IDs can change after cancellation/reload. Cross-client IDs must be mod-owned and mapped locally. No transport, normal player-edit capture or global engine determinism is proven.

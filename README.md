@@ -1,8 +1,8 @@
 # Planet Coaster 2 — Real-Time Co-op Research
 
-> **Project status — 2026-10-21:** Early feasibility and modding research. **No playable co-op mod, no validated programmatic scenery placement, and no two-client synchronization.**
+> **Project status — 2026-10-21, diagnostics 007–034:** Scripted scenery creation, movement, deletion and local save/reload persistence are verified. Ordered replay and duplicate/conflict checks work in the tested local scenarios. **No playable co-op mod or live two-client synchronization yet.**
 
-We are investigating how two players might build in the same **Planet Coaster 2** park in real time. The immediate goal is **one confirmed, persistent scenery edit**, not guests, rides, terrain, economy or full simulation synchronization.
+We are investigating how two players might build in the same **Planet Coaster 2** park in real time. The next goal is a harmless message exchange between two genuine clients, followed by replication of a validated scenery command. Guests, rides, terrain, economy and full simulation synchronization remain outside the initial scope.
 
 ## Progress at a glance
 
@@ -11,8 +11,10 @@ We are investigating how two players might build in the same **Planet Coaster 2*
 | Custom Lua mod loads | **Verified in PC2:** ACSE 0.729 loads the diagnostic mod; ForgeUtils 2.7.0's hook manager can be required. |
 | ACSE world component survives park transition | **Verified:** minimal component with `Shutdown()` deactivates in `startscreenglobe` and is recreated in `tropicalworld` (diagnostic 005). |
 | Editor and undo API visible in the park | **Verified:** diagnostic 006 found `worldAPIs.editors`, `CreateUndoOperationsHierarchy`, and four `api.undo` methods as functions in `tropicalworld`. **Presence checks only.** |
-| Create an undo hierarchy | **Next experiment — diagnostic 007. Not yet run.** |
-| Create, commit, save and reload a scenery part | **Not verified.** |
+| Create an undo hierarchy | **Verified:** invoked successfully from our component (007/008). |
+| Create, move, delete, save and reload a scenery part | **Verified for AQ_Rock_04:** diagnostics 009–025. |
+| Ordered commands, duplicates and conflicts | **Verified locally:** 028/029; separate A/B replay states matched after twelve inputs in 030. |
+| Lua transport access | **Investigation 031–034:** candidate HTTP/Kepler functions resolve; signatures, free URLs and raw response access remain unknown. |
 | Send a scenery edit between two game clients | **Not implemented or tested.** |
 
 The successful 005/006 logs came from a **copied test installation launched outside Sandboxie**. They establish PC2 behavior in that copied installation, **not** validation of the fully sandboxed launch path. A separate Sandboxie setup is documented below. See the [runtime test record](docs/testing/RUNTIME_TESTS.md).
@@ -21,7 +23,7 @@ The successful 005/006 logs came from a **copied test installation launched outs
 
 - **[Documentation guide](docs/README.md)** — a map of the project by topic.
 - **[Current research status](docs/research/STATUS.md)** — concise verified findings, limitations and next milestone.
-- **[Runtime tests (005/006/007)](docs/testing/RUNTIME_TESTS.md)** — what was actually tested, failures and controls.
+- **[Runtime tests (005–034)](docs/testing/RUNTIME_TESTS.md)** — what was actually tested, failures and controls.
 - **[Scenery placement and undo](docs/placement/README.md)** — the path toward creating a durable park object.
 - **[Sandboxie test setup](docs/ISOLATED-INSTALLATION.md)** — separate host/guest boxes, token compatibility and isolation caveats.
 - **[Prototype plan](docs/prototype/PLAN.md)** — acceptance criteria for one replicated scenery part.
@@ -30,7 +32,9 @@ For historical experiments and traceability: [research log](docs/research/LOG.md
 
 ## What we know — and what we do not
 
-PC2's inspected editor Lua provides a **static** scenery path through `CreateNewPart`, preview, and a deferred commit. In a running PC2 park, our own diagnostic confirmed that the editor API and undo method names are accessible. **We have not yet invoked `CreateUndoOperationsHierarchy()` from our mod**, nor demonstrated a created scenery part surviving save/reload. The next experiment is intentionally read-only apart from constructing an empty hierarchy; it will not commit any edits.
+Our component now uses the scenery hierarchy, create/edit/destroy operations, completed previews and single commits. Creation, movement and deletion were checked after local save/manual reload. Two identical rocks can be addressed independently. Commands reject tested ordering errors and conflicting ID reuse. See the [007–034 diagnostic ledger](docs/research/DIAGNOSTICS_007_034.md).
+
+Separate A/B-labelled runs produced matching canonical states, but did not exchange messages or run as a demonstrated simultaneous client pair. The present blocker is [command transport](docs/networking/TRANSPORT.md), followed by confirmed user-edit capture, identity mapping and recovery.
 
 An earlier custom world component caused a crash during the menu-to-park transition. A later minimal component that included `Shutdown()` passed that transition; because other probes were removed at the same time, **we cannot attribute the fix solely to `Shutdown()`**. Full history: [runtime tests](docs/testing/RUNTIME_TESTS.md).
 
@@ -48,6 +52,7 @@ This repository contains our own notes, not redistributed game binaries, assets,
 | --- | --- |
 | Lua / world architecture | [Architecture](docs/architecture/OVERVIEW.md) |
 | Editing / undo / creation | [Placement](docs/placement/README.md) and [ACSE + ForgeUtils research](docs/placement/ACSE_FORGEUTILS.md) |
+| Command transport | [HTTP/Kepler and Lua capability investigation](docs/networking/TRANSPORT.md) |
 | Saving / persistence | [Serialization](docs/serialization/README.md) |
 | Tools and decompilation | [Modding references](docs/modding/README.md) |
 | Contribution / evidence rules | [AGENTS.md](AGENTS.md) |

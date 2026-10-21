@@ -48,3 +48,17 @@ Future entries: record date, test build + SHA-256, original symbol/source, test 
 - A separate Sandboxie host/guest setup and previous `UnstrippedToken=y` launch compatibility are described in [the translated notes](../ISOLATED-INSTALLATION.md). The user-reported main-menu start in that configuration does not establish that diagnostic 006 was run inside Sandboxie, nor prove the failure was due to Denuvo.
 - **Next planned diagnostic 007 (not yet run):** Invoke `editors:CreateUndoOperationsHierarchy()` in a disposable park; report return type and available hierarchy methods; no creation, preview or commit of scenery objects.
 - Repository documentation reorganized around [current status](STATUS.md), [runtime test matrix](../testing/RUNTIME_TESTS.md), [topic index](../README.md) and [active blockers](OPEN_QUESTIONS.md). Existing historical failure logs remain in this chronology; no raw logs or binaries were published.
+
+## 2026-10-21 — Diagnostics 007–034: durable scenery and transport boundary
+
+- Consolidated owner-run tests and earlier private log reviews: hierarchy invocation, change list, AQ_Rock_04 creation, editor transform access, cross-Advance checks, preview/cancel and single commits succeeded.
+- Creation persisted at (10,5,10) in 019; existing-part movement persisted at (15,5,10) in 022; deletion persisted in 025. Mutation/save and manual reload verification were separate code phases, preventing accidental replay during loading.
+- 026/027 proved independent handling of two identical resources using mod keys and local part IDs.
+- 028: eight inputs, four duplicate skips, four commits. 029: four order rejections, four conflicting-ID rejections, four valid commits.
+- 030: twelve inputs in separate A/B-labelled runs; all 120 canonical STATE records matched after label/timestamp removal. Repeatability only, not actual client synchronization.
+- 031 found no standard io/os/LuaSocket access; planned file roundtrip skipped. package.loadlib present but not invoked.
+- 032 raw enumeration was incomplete. 033 found five named fields as functions. 034 resolved those same five controls, with all nine invented names nil, no errors and Completed=true. Neither read-only test invoked the resolved functions.
+- Static workshop/newsfeed/account code uses specialized request handles and structured result getters. Arbitrary URLs and raw HTTP response text remain unknown; no CreateKeplerHttpRequest call site found in supplied material.
+- Fully decompiled the supplied FrontierAccountManager using unluac --nodebug after debug-informed decompilation failed at PrepareToShutdown. Parsed all 135 bytecode prototypes, produced 134 function declarations plus main and a full disassembly. Original files unchanged; analysis outputs stay private; reconstruction not executed.
+- Rechecked retained 022/025/030/034 evidence for this documentation update. Earlier test results were not rerun. Full ledger: [007–034](DIAGNOSTICS_007_034.md); next blocker: [transport](../networking/TRANSPORT.md).
+- Updated current docs to supersede planned-007 and no-persistence statements, retaining historical failures and outside-Sandboxie 005/006 qualifications. No second simultaneous client, confirmed player-edit capture, distributed recovery or playable co-op is claimed.

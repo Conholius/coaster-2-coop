@@ -1,34 +1,32 @@
 # Open questions and next experiments
 
-[← Current status](STATUS.md) · [Runtime tests](../testing/RUNTIME_TESTS.md) · [Prototype plan](../prototype/PLAN.md)
-
-**Prioritized as of 2026-10-21.** A method that **exists** in a Lua API has not necessarily been **called**, and a successful call is not proof of persistence.
+**Updated 2026-10-21 through diagnostic 034.** [Status](STATUS.md) · [Transport](../networking/TRANSPORT.md)
 
 ## Immediate blockers
 
-1. **Diagnostic 007 — hierarchy invocation:** Can our ACSE component in `tropicalworld` execute `editors:CreateUndoOperationsHierarchy()`, receive a valid hierarchy and inspect its methods without destabilizing a world transition? **Not tested.**
-2. **Exact scenery edit arguments:** Which base-game scenery resource and parameters does `CreateNewPart` require, how are completion tokens awaited, and which coordinate/ID types does the editor use? Static call sites are known, not yet confirmed by a runtime edit trace.
-3. **Durable edit:** Can a single, user-authorized scenery change go through preview, commit, save, exit and reload without duplicates? **No evidence yet.**
-4. **Confirmed-change capture:** Where can we observe *committed* edits rather than transient previews or gizmo movement?
-5. **Identity mapping:** How do `EntityID`, `PlacementID`, `PlacementPartID`, saved IDs and mod-defined network IDs relate across reload and clients?
+1. **Transport:** What exact parameters construct CreateKeplerHttpRequest? Does it accept arbitrary/loopback URLs, and how is raw response text read? Function-valued access is verified; invocation is not.
+2. **Two real clients:** Can separately authorized clients run concurrently, load matching baselines and exchange a harmless message/ack without game edits?
+3. **Edit capture:** Where can our mod observe an ordinary player-confirmed create/move/delete without echoing remote edits or reacting to transient previews?
+4. **Identity:** How will persistent mod-owned object keys map to each client's local PlacementPartID and transient EntityID, including reload and deletion tombstones?
+5. **Recovery:** What authority, ownership, ordering, acknowledgement, durable command journal and resync rules handle disconnects, crashes and concurrent operations?
 
-## Next phase after persistence
+## Remaining coverage
 
-6. **World serialization:** Which implementation backs the park world's `worldserialisation` API, and how can we compare lasting placement state?
-7. **Two-client baseline:** Can two separately authorized clients load identical base parks and compare canonical inventories while keeping Steam/profile and save boundaries isolated?
-8. **Replication protocol:** Which ordering, validation, authority, retry and rollback model reproduces the same scene without conflicts or corruption?
-9. **Version and distribution:** Which exact game/ACSE build hashes and licensing or launcher constraints apply to a reproducible package?
+- Version/executable/mod hashes, packaging and licensing for reproducible distribution.
+- Multi-object groups, undo/redo, rotations/scales, different scenery and invalid placement/permission failures.
+- Repeated persistence tests, stable canonical world inventories, save metadata for mod-owned mappings.
+- Steam/profile/Cloud isolation and independently usable guest configuration.
+- Native Lua module/bridge compatibility if built-in HTTP cannot provide the required transport.
 
-## Environment and safety uncertainties
+## Answered within the tested scope
 
-- **Sandboxie:** A separate `PC2CoopHost` setup has previously reached the menu with `UnstrippedToken=y`, but the **successful 005/006 editor sessions were run outside Sandboxie**. Can the same diagnostic and later controlled edits be reproduced in the sandbox? Does the guest launch independently? **Unknown.**
-- **Earlier world-transition crash:** Minimal component with `Shutdown()` and removed probes works; was the original failure caused by the missing callback, unsafe probing, or their interaction? **Not isolated.**
-- **ACSEDebug:** Cross-game logging works; provenance, debug menu and native safety are unverified. Avoid the GUI.
-- **Denuvo attribution:** The observed Sandboxie startup improvement does not prove the failure was caused by Denuvo or that `UnstrippedToken=y` bypasses anti-tamper.
+- Hierarchy creation and change-list access: diagnostics 007/008.
+- Scripted AQ_Rock_04 creation, transform, preview, cancel, commit and world lookup: 009–018.
+- Creation/movement/deletion persistence after manual reload: 019/022/025.
+- Independence of two equal-resource parts: 026/027.
+- Session-local duplicate suppression and ordering/ID-conflict rejection: 028/029.
+- Canonical replay agreement across twelve inputs in separate A/B runs: 030.
+- Lua io/os/LuaSocket unavailable in the tested environment: 031; no file roundtrip completed.
+- Five named API fields resolve as functions while nine invented names resolve as nil: 033/034. Signatures and networking behavior remain unknown.
 
-## Recently answered (limited scope)
-
-- **Can a custom ACSE component survive `startscreenglobe → tropicalworld`?** Yes, in the copied PC2 test installation, diagnostic 005 + park transition.
-- **Are editor and undo APIs present in a loaded park?** Yes, diagnostic 006 returned `true` for the specified method-presence checks in `tropicalworld`. **Invoking those methods remains untested.**
-
-Historical open questions and chronology are preserved in [LOG.md](LOG.md). Each newly answered question needs an actual runtime log or source anchor, with explicit limitations.
+Historical failures remain in [LOG.md](LOG.md); they are not the current blocker. No playable co-op or live two-client synchronization is claimed.

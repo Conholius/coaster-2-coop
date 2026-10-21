@@ -1,46 +1,45 @@
 # Current research status
 
-**Updated 2026-10-21.** [Project overview](../../README.md) · [Runtime tests](../testing/RUNTIME_TESTS.md) · [Open questions](OPEN_QUESTIONS.md)
+**Updated 2026-10-21 through diagnostic 034.** [Overview](../../README.md) · [Runtime record](../testing/RUNTIME_TESTS.md) · [Transport](../networking/TRANSPORT.md)
 
-## Verified in a running PC2 copy
+## Verified in a running game
 
-Test environment reported in logs: **Planet Coaster 2 1.11.4.1011357**, **ACSE 0.729**, **ForgeUtils 2.7.0**, **ACSEDebug 0.014**. The 005/006 sessions used a **copied test installation outside Sandboxie**.
+Reported environment: Steam / Windows, PC2 **1.11.4.1011357**, ACSE **0.729**, ForgeUtils **2.7.0**, ACSEDebug **0.014**. Executable/package hashes are not established in this public record.
 
-- `PC2CoopDiagnostics` loads from `Main.ovl`; `LuaDB.Init()` logs, and `require("forgeutils.hookmanager")` returns a table exposing `AddHook`. **This is not proof a ForgeUtils hook was executed.**
-- After fixing the packaged `Main.ovl`, diagnostic **005** confirmed component registration and menu-world `Configure`, `Init`, `OnWorldActivation`.
-- The minimal component **with `Shutdown()`** ran `OnWorldDeactivation` and `Shutdown` when switching worlds, was recreated for `tropicalworld`, and let the park load and exit normally.
-- Diagnostic **006** inspected `tropicalworld`: `GetWorldAPIs()` succeeded, `worldAPIs.editors` was accessible, and `CreateUndoOperationsHierarchy`, `api.undo.PreviewChangeList`, `CanCommitPreview`, `CommitPreview`, and `CancelPreview` were present as Lua-callable functions. **No editor method was executed beyond obtaining the world APIs and inspecting fields.**
-- ACSEDebug produced useful trace logs. **Its cross-game debug GUI / native functions remain unverified and should not be used.**
+- The custom ACSE component registers, activates in a park and is recreated across world transitions. Availability of ForgeUtils AddHook is established; execution of a particular hook is not.
+- Diagnostics **007–018** progressed from real undo-hierarchy creation to creation of base-game scenery resource **AQ_Rock_04**, editing its transform, completed preview/cancel, and a single completed commit. The created world part was checked over two component Advances.
+- **019** saved a new local park and, in a separate verification-only run after manual loading, found part **1182**, AQ_Rock_04, at **(10, 5, 10)**.
+- **020–022** edited the existing part, tested restoration, committed movement to **(15, 5, 10)**, and verified that movement after a new local save and manual reload.
+- **023–025** tested deletion preview/cancel, committed deletion and verified continued absence of the part and entity mappings after save/reload.
+- **026–027** distinguished two identical resources by mod-owned keys and local part IDs; moving A and deleting B left the other object unchanged.
+- **028** processed eight scripted inputs, skipped four duplicate commands and committed four actions.
+- **029** rejected four ordering errors and four same-ID/different-payload conflicts; four valid actions committed, A ended at (15, 5, 10), B absent.
+- **030** produced matching canonical states after all twelve inputs in separate A/B-labelled runs: **120/120 STATE records matched** after removing instance labels and timestamps. This is repeatability, not live client replication.
+- **031–034** investigated transport capability. Ordinary field lookups resolve five candidate API functions; nine invented names all return nil. No candidate network function was invoked by 033/034.
 
-Reproducible timeline and caveats: [runtime diagnostics](../testing/RUNTIME_TESTS.md).
+Details and evidence boundaries: [diagnostics 007–034](DIAGNOSTICS_007_034.md).
 
-## Static research (not yet runtime-validated for scenery creation)
+## Current blocker: command transport
 
-- Decompiled PC2 scenery code in `SubModePathSnapPlacement` and brush placement shows an undo hierarchy, `CreateNewPart`, edit/clone cases, a preview lifecycle and delayed commit/cancel. Decompiled code has known vector-placeholder caveats.
-- PC-CC's existing PC2 source shows an editor hierarchy followed by a full change list and preview/commit; its demonstrated operation is **track-specific**, not proof of scenery placement from our mod.
-- Game save infrastructure delegates to world serialization; `LocalChangeManager` tracks save versions, not editor actions.
-- `InstantiatePrefab` creates game entities but has **not** been shown to create an editable, persisted park scenery placement.
+The tested Lua environment exposes neither standard io/os nor an available LuaSocket module. The planned file roundtrip was **skipped**, not passed. Native HTTP/Kepler functions are promising candidates, but arbitrary URLs and raw response text remain **unknown**.
 
-See [placement](../placement/README.md), [public source investigation](../placement/ACSE_FORGEUTILS.md) and [evidence index](EVIDENCE.md).
+Static source shows RunKeplerRequest(requestHandle) used with specialized requests. No CreateKeplerHttpRequest call site has been found in the supplied corpus, including the now fully decompiled FrontierAccountManager. Do not guess a native constructor signature. See [transport investigation](../networking/TRANSPORT.md).
 
-## Historical failure — no longer the current blocker
+## Not yet demonstrated
 
-An earlier custom component **without a `Shutdown()` method and with extra editor probing** crashed when leaving `startscreenglobe` for a new tropical park. Disabling its registration was a successful A/B control. A later **minimal component with `Shutdown()`** made the transition successfully, followed by successful editor *presence* checks in diagnostic 006. Because the modifications were not isolated one at a time, **the exact earlier crash cause is still unknown**. Do not present missing `Shutdown()` as the proven cause. See [research log](LOG.md).
+- Two simultaneously running independent clients exchanging commands; remote gameplay or playable co-op.
+- Capture of ordinary player-confirmed scenery edits. The diagnostics use scripted commands.
+- Authority/ownership, concurrent edits, durable deduplication, reconnect, crash recovery, late join or resynchronization.
+- Persistent mod-owned network-ID mapping across saves and different clients.
+- General object support beyond the tested rock; terrain, paths, tracks, rides and simulation synchronization.
+- Undo/redo behavior after committed multiplayer operations.
 
-## Next milestone — not yet run
+## Test context and historical qualifications
 
-**Diagnostic 007:** call `worldAPIs.editors:CreateUndoOperationsHierarchy()` in `tropicalworld`; inspect the returned hierarchy without adding edits, previewing or committing. **No successful hierarchy creation has yet been logged.**
+005/006 were explicitly reported as copied-install runs **outside Sandboxie**. A separate host Sandboxie configuration reached the menu with UnstrippedToken=y. Later tests were performed by the owner using the test-copy workflow; do not retroactively infer process isolation from a log filename or relocated path. A second Sandboxie guest/client and complete Steam Cloud isolation remain unvalidated.
 
-After that, establish exact scenery-operation parameters, run a controlled single-part preview/commit on a disposable park, verify save/reload persistence and only then consider two-client replay.
+UnstrippedToken reduces token isolation; its startup success does not identify Denuvo as the cause. The initial world-transition crash was not experimentally attributed solely to missing Shutdown(). ACSEDebug logging works; its cross-game GUI/native features remain unvalidated.
 
-## Sandboxie and test safety
+## Next milestone
 
-A **separate, previously configured** Sandboxie host/guest setup is recorded in [ISOLATED-INSTALLATION.md](../ISOLATED-INSTALLATION.md). Its `UnstrippedToken=y` compatibility setting weakens token isolation; the relation to Denuvo is **unproven**. **Do not conflate this configured setup with the non-Sandboxie 005/006 runtime sessions.** The guest has **not** been validated as a second PC2 client.
-
-Use backups and disposable saves. No production game files, logs, credentials or dumps are published here.
-
-## Still unproven
-
-- Invoking `CreateUndoOperationsHierarchy` in our component and inspecting its returned hierarchy.
-- Programmatically creating, committing, saving and reloading an ordinary scenery part.
-- Detecting only user-confirmed edits, mapping stable placement IDs across clients, network transport, conflict recovery and real-time co-op.
+Find a supported request constructor, own-server destination and readable response path, or establish an original local bridge. First transport test should exchange a harmless identifier/acknowledgement, with **no game edits**. Only after that connect the existing command checks to two genuine clients. Keep raw logs, saves, binaries and complete game decompilations private.
