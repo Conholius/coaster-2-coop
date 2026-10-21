@@ -45,3 +45,11 @@ These are credited research references and candidate foundations. This repositor
 ## Collaboration
 
 Inspired by [Co-op Anything](https://github.com/cranebeaker/coop-anything). Its [AGENTS.md](https://github.com/cranebeaker/coop-anything/blob/main/AGENTS.md) should be reviewed before contributing. The public game claim is tracked in [Co-op Anything issue #74](https://github.com/cranebeaker/coop-anything/issues/74). It describes the current feasibility-research stage; no functioning co-op prototype or persistent programmatic scenery-edit test has been demonstrated.
+
+## Runtime compatibility warning — cross-game ACSEDebug (tested 2026-10-21)
+
+**Do not assume the ACSEDebug package intended for Planet Zoo / earlier Frontier games is fully compatible with Planet Coaster 2.** In one isolated Windows PC2 test installation (game build **1.11.4.1011357**, ACSE **0.729**, ForgeUtils **2.7.0**), ACSEDebug **0.014** *did* produce a `Planet Coaster 2.log` and captured our original mod's `api.debug.Trace()` messages. This is **partial runtime compatibility**, **not** validation of its debug menu or every native feature. The exact cross-game package provenance should be independently checked before generalizing.
+
+The same installation crashed on a new sandbox-park load with a custom ACSE `AddLuaComponents` world-diagnostic component enabled; disabling **that component registration**, while **keeping ACSEDebug enabled**, allowed the park to load and run for more than 60 seconds, then exit normally. Thus **the crash is not evidence that ACSEDebug alone prevents park loading**; the specific custom component lifecycle remains under investigation. The debug menu was **not tested in the successful park-load run** and should be treated as potentially unsafe. **Back up the isolated install, avoid the debug menu, and do not install cross-game debug binaries into a normal game installation.**
+
+Detailed reproducible observations and remaining caveats: [research status](docs/research/STATUS.md), [research log](docs/research/LOG.md).
