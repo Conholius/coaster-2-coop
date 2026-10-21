@@ -21,6 +21,7 @@ An independent research and prospective modding project investigating real-time 
 - [Save/load and serialization](docs/serialization/README.md)
 - [Modding tools and comparative references](docs/modding/README.md)
 - [First prototype criteria and testing](docs/prototype/PLAN.md)
+- [Isolated Windows/Sandboxie installation and compatibility notes](docs/ISOLATED-INSTALLATION.md)
 - [File evidence index](docs/research/EVIDENCE.md)
 - [Open questions](docs/research/OPEN_QUESTIONS.md)
 - [Instructions for coding agents](AGENTS.md)
