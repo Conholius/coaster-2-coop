@@ -16,3 +16,9 @@ An answer requires a source reference and, for runtime claims, a recorded test. 
 ## Narrowing from public source research (2026-10-20)
 
 [PC2 mod source now demonstrates the general preview/commit lifecycle](../placement/ACSE_FORGEUTILS.md), including operation-token waiting. Additional PC2 scenery editor Lua now supplies concrete scenery creation/edit/clone and deferred commit call sites. Question 1 is narrowed to runtime invocation and reliable event interception. Question 2 still requires save/reload tests. ForgeUtils catalogue registration is not that missing operation. ACSE's serializer must be checked against the actual PC2 package before considering it as an alternate persistence path.
+
+## Runtime diagnostics / component lifecycle (2026-10-21)
+
+- **ACSEDebug compatibility:** A cross-game ACSEDebug 0.014 package successfully logged from PC2 1.11.4.1011357 with ACSE 0.729, but are its debug menu and native helpers safe? **Unknown; avoid debug UI.** Exact installed cross-game package provenance and hashes are not yet independently documented. Do not recommend unconditional installation.
+- **Custom component park-transition crash:** Why does the PC2CoopDiagnosticComponent registered with `AddLuaComponents` crash during `startscreenglobe -> tropicalworld`? A successful control disabled that registration while keeping ACSEDebug present. Investigate expected `Shutdown`, `OnWorldDeactivation`, recreation and manager registration contracts, without assuming one missing callback caused the crash.
+- **Editor presence vs invocation:** Editor / undo methods existed during `startscreenglobe` activation; are these APIs also safely callable after the actual `tropicalworld` has activated? Currently **untested**.
