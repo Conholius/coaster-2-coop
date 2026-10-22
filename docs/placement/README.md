@@ -52,4 +52,9 @@ Diagnostic **006** in the copied PC2 test installation **outside Sandboxie** suc
 
 Diagnostics 007–025 successfully exercised hierarchy/change-list construction, AQ_Rock_04 creation, StartEditingPart_Scenery, transform changes, completed preview/cancel/commit, local save and verify-only manual reload. The test part 1182 persisted at (10,5,10), later at (15,5,10), and was absent after saved deletion. 026–030 added independent equal-resource objects and guarded ordered command replay.
 
-See the [full lifecycle, exact tested signatures and limitations](../research/DIAGNOSTICS_007_034.md). Part IDs in that record belong to one test park; entity IDs can change after cancellation/reload. Cross-client IDs must be mod-owned and mapped locally. No transport, normal player-edit capture or global engine determinism is proven.
+See the [full lifecycle, exact tested signatures and limitations](../research/DIAGNOSTICS_007_034.md). Part IDs in that record belong to one test park; entity IDs can change after cancellation/reload. Cross-client IDs must be mod-owned and mapped locally. Native loopback transport was subsequently verified in 037b–047, but normal player-edit capture and global engine determinism remain unproven.
+
+
+## Grouped creation update — diagnostics 048/049 (2026-10-22)
+
+Both created 274 unique rocks with 16 group previews/commits/checkpoints and 32 world checks, without diagnostic saves. Issuing all CreateNewPart requests with one shared completion token before waiting reduced tested up-to-50 groups to one preparation Advance; preview used two and commit one. This is successful grouped request submission/completion, not proof of concurrent CPU execution or universal group support. See [measurement boundaries](../networking/BENCHMARKS.md). Larger-group / growing-park diagnostic 050 is pending; its target counts are not verified.

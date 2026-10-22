@@ -1,25 +1,66 @@
-# Command transport investigation
+# Native HTTP transport in Planet Coaster 2
 
-**As of 2026-10-21; diagnostics 031–034.** [Current status](../research/STATUS.md)
+**Updated 2026-10-22; runtime evidence through diagnostic 049. Diagnostic 050 is prepared / owner testing; no result is claimed.**
 
-## Verified runtime capability
+[Current status](../research/STATUS.md) · [035–049 evidence ledger](../research/DIAGNOSTICS_035_049.md) · [Proposed synchronization](HTTP_SYNC_DESIGN.md) · [Measurements](BENCHMARKS.md)
 
-| Test | Observation | Boundary |
-| --- | --- | --- |
-| 031 | Lua 5.3; global io and os nil; require("io"), require("socket") and require("socket.core") failed | File write/read/cleanup and socket-object tests skipped; no transport established |
-| 031 | package.loadlib present as function | Not invoked; native ABI/module loading untested |
-| 032 | Raw table enumeration found only part of the API; protected metatables returned strings | Empty raw table is not proof of absent API methods |
-| 033 | Ordinary protected field accesses returned function for the five names below | No returned function invoked |
-| 034 | Same five controls returned function; all nine invented names returned nil; checked=14, failedOrSkipped=0, Completed=true | Rejects the tested arbitrary-name-wrapper hypothesis, not a signature or functionality test |
+## Verified in a running game
 
-Five resolved names:
-- api.http.URLEncode
-- api.online.CreateKeplerHttpRequest
-- api.online.GetKeplerEndpoint
-- api.online.RunKeplerRequest
-- api.IRC.RemoveIRCNotificationListener
+The transport blocker recorded at diagnostic 034 has been resolved for the tested **native HTTP GET to an owner-controlled loopback server**. Diagnostics 037b–047 demonstrate text request/response transport. 038 demonstrates a server retaining messages between **sequential A, B and A-again game runs**, not simultaneous clients. 040–042 connect downloaded commands to real scenery creation/movement with session-local duplicate suppression.
 
-034 used three invented names (PC2Coop034_NoSuchFunction_7F29A1, _B84C62 and _D903E5) in each of http, online and IRC. All returned nil. Neither listeners nor network requests were started by 033/034.
+Test environment: Windows / Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 2.7.0, ACSEDebug 0.014. Binary hashes are not established in this public record. Claims apply to this tested setup, not every PC2 release.
+
+## Runtime-confirmed native request contract
+
+The original diagnostic component's request worker (037b–047; retained 047 source, worker around lines 410–489) uses:
+
+```lua
+-- Fragment INSIDE an api.task.Spawn worker, after context readiness.
+local request = api.online.CreateKeplerHttpRequest(playerID)
+request:SetUrl(loopbackURL)
+request:SetMethod(api.online.KeplerMethod_Get)
+request:SetGenerateAuthCode(false)
+local success, resultCode, response = api.online.RunKeplerRequest(request)
+-- Success/error code is separate from the HTTP status.
+-- For the tested successful responses:
+-- success == true
+-- response.nResponseCode == 200
+-- response.sBody is the complete response text string
+```
+
+This is a contract illustration, not a standalone script: retain the request AND task until completion, poll `api.task.JoinAsync(task)` from Advance, handle the result, then release references. The tested implementation has **one in-flight native request**, not a background thread manipulating the editor. Dispatch validated editor actions through the world component's controlled Advance/coroutine sequence. Stop on world/owner changes. A pending request is not assumed cancellable just because a local timeout elapsed.
+
+The constructor receives the game-owner/player ID; the destination is set with **SetUrl**, not passed as a guessed constructor argument. Generic HTTP body access is the **third RunKeplerRequest return's sBody**, not a second-return string or a specialized request getter. GET, plain loopback HTTP and text downloads are runtime-tested. Remote HTTPS, certificate/proxy behavior, uploads/POST/PUT, arbitrary binary bodies, authentication headers, compression, connection reuse and long-poll timeout behavior are **not established by these tests**.
+
+## Readiness and Frontier dependence
+
+Diagnostic 045's gate, also used by 046/047:
+
+1. `api.player.GetGameOwner()` identifies a valid player according to `api.player.IsValid(playerID)`.
+2. `api.online.IsKeplerAvailable()` is true.
+3. `api.online.IsKeplerUser(playerID)` is true.
+
+Observe FrontierAccountManager `IsConnected` / `IsConnecting` for evidence, but **do not require IsConnected for a local request**. The verified gate works without an active Frontier connection.
+
+- 037: early invocation failed, Kepler result **19 (Cancelled)**, no request at the local server. The enum interpretation comes from prior private native inspection; cancellation alone does not identify its cause.
+- 037b: waiting for full online initialization allowed a successful request, but was an unnecessarily strong gate.
+- 043: after a previously established Frontier connection was lost, three LOSS-group local requests still succeeded. The recovery part did not finish; the overall test was not a completed recovery proof.
+- 044: internet disconnected before launch; an early no-context request failed, then two succeeded after a Kepler user context appeared, without Frontier login. This is NOT proof of success without any Kepler context.
+- 045: all three requests succeeded with Kepler context and Frontier disconnected.
+
+**Conclusion within scope:** active Frontier connectivity is not required once the tested native context is ready, including the tested offline startup. Complete independence from cached account state, Steam availability, licensing, a future SDK change or permanent service shutdown remains unknown. Remote peers still need a working network path to their relay.
+
+## Why the Gameface/JavaScript route was set aside
+
+035b established a custom Lua-to-JavaScript-to-Lua message roundtrip and view/resource cleanup. 036/036b JavaScript HTTP attempts reported 404 while the owner-controlled server saw no corresponding request. A separate Python control from the same PC2CoopHost sandbox reached exactly that server with HTTP 200 and the expected marker/body.
+
+Prior private inspection of PC2's native Gameface resource handling reported resource-oriented dispatch rather than demonstrated forwarding of these external requests. The controls are consistent with a rejection/404 in the embedded resource path, not a missing Python route or a general Sandboxie loopback block. Do not extrapolate this to every Gameface configuration or claim the control proves all per-process network permissions. The supported path for our tested transport is native Kepler HTTP; JavaScript is not required.
+
+## Capability history (031–034)
+
+031 found no usable standard io/os or LuaSocket; the file roundtrip was skipped, not passed. package.loadlib existed but was not invoked. Raw API enumeration in 032 was incomplete. In 033/034, five candidate named fields resolved as functions while nine invented fields were nil. These were presence tests only; later request diagnostics establish behavior.
+
+Named controls: api.http.URLEncode, api.online.CreateKeplerHttpRequest, api.online.GetKeplerEndpoint, api.online.RunKeplerRequest and api.IRC.RemoveIRCNotificationListener. No custom IRC sender/channel was established; no need to instantiate account/workshop managers for our relay.
 
 ## Observed in supplied extracted material
 
@@ -37,22 +78,10 @@ These are source anchors, not redistributed source. File line numbers refer to t
 | FrontierAccountManager, SearchPlayers / _DownloadImage | URLEncode and specialized franchise SearchPlayers / DownloadImage | URL encoding and image download are not proof of generic text HTTP |
 | online park-session / notification managers, PrepareIRCListeners | Structured IRC notifications for park locks, friendships and updates | No custom sender, server address or general IRC protocol access demonstrated |
 
-RunKeplerRequest receives one request handle in the observed calls, with two captured returns (success and result/error). Payloads are read through specialized handle getters; the second return is not established as raw response text. Callers use task/coroutine contexts; do not infer safe synchronous behavior in Advance.
+In these specialized source call sites, RunKeplerRequest receives a request handle and callers capture two returns. Later generic HTTP runtime tests capture a THIRD return containing the response table. Neither the second return nor a specialized article getter is the raw HTTP body. Generic HTTP uses response.sBody as documented above.
 
 Some online-notification handlers acknowledge/delete stored notifications. Instantiating such a manager is not a passive read-only probe.
 
-## CreateKeplerHttpRequest: still unknown
-
-No call site was found in the currently supplied Decompiled corpus, including binary string searches and the complete FrontierAccountManager reconstruction. This is a corpus limit, not proof the function is unusable.
-
-An older PC2_1.0.6.429191_API.lua lists the constructor and KeplerMethod_Get/Put/Post/Delete constants. That dump does not supply a signature or prove current constant values. The current function value was separately verified by 033/034.
-
-Unanswered:
-- Constructor arguments and ownership/lifetime.
-- Free URL versus relative/predefined Frontier endpoint.
-- HTTP methods, headers and body setters.
-- Response bytes/text, status, cancellation and completion behavior.
-- Loopback/plain HTTP availability, authentication requirements and sandbox access.
 
 ## Decompilation qualification
 
@@ -62,6 +91,7 @@ unluac v1.2.3.569 failed in the debug-informed decompile at source lines 291–3
 
 No complete decompiled scripts, bytecode or game resources are distributed in this repository.
 
-## Next test design (not run)
 
-Find a real constructor call/type description before invoking native methods. If unavailable, investigate an original external bridge and its Lua ABI separately. First prove message/ack transport with no editor/save calls. Then connect a validated, ordered, session-deduplicated command to two actual clients and compare canonical states. A remote connection does not itself establish safe replay or durable exactly-once effects.
+## Next acceptance gate
+
+Use two independently authorized real clients at the same time, with matching park baselines, first for harmless messages and then a scripted scenery command. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.

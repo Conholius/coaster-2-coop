@@ -62,3 +62,18 @@ Future entries: record date, test build + SHA-256, original symbol/source, test 
 - Fully decompiled the supplied FrontierAccountManager using unluac --nodebug after debug-informed decompilation failed at PrepareToShutdown. Parsed all 135 bytecode prototypes, produced 134 function declarations plus main and a full disassembly. Original files unchanged; analysis outputs stay private; reconstruction not executed.
 - Rechecked retained 022/025/030/034 evidence for this documentation update. Earlier test results were not rerun. Full ledger: [007–034](DIAGNOSTICS_007_034.md); next blocker: [transport](../networking/TRANSPORT.md).
 - Updated current docs to supersede planned-007 and no-persistence statements, retaining historical failures and outside-Sandboxie 005/006 qualifications. No second simultaneous client, confirmed player-edit capture, distributed recovery or playable co-op is claimed.
+
+
+## 2026-10-22 — Native HTTP, offline context and batched scenery (035–049)
+
+- Consolidated prior owner-run 035b–049 log/control reviews, reread retained 038 A/B/A2 logs and 047 native worker/server evidence; no game run during documentation work.
+- Lua-JS roundtrip passed; JS external HTTP did not reach loopback server. Independent Python in the same sandbox passed; private resource-handler investigation supports using native HTTP instead.
+- Generic Kepler contract established: constructor playerID, SetUrl/GET/SetGenerateAuthCode(false), Spawn worker, RunKeplerRequest third response with nResponseCode/sBody, JoinAsync lifetime handling. Early 037 cancellation is historical; later successful tests supersede "unknown transport".
+- 038 exchanged messages through a retained server between sequential runs; A-again completed receipt and repeat sends were duplicates. This is not simultaneous co-op. Remote friend test prepared but not completed.
+- 039 validated 16 inputs; 040–042 applied local HTTP CREATE/MOVE and suppressed repeated commands without extra commits.
+- 043 local requests passed after Frontier loss, but recovery incomplete. 044 early no-context request failed, later offline-start requests passed after context appeared. 045 confirms readiness does not require active Frontier connection. No Steam/cache/service-independent startup claim.
+- Correct 046 online/offline and settled/mixed 047 downloads passed. 047: 110/110, full content, joins and releases; no strong size bottleneck to 1 MiB locally, not internet bandwidth proof.
+- 048/049 each passed 274 unique rocks, 16 commits/checkpoints and 32 world checks. Shared completion reduced 50-object preparation from 50 Advances to one; pipeline from 53 to four. Same-frame clock under-resolution and trace overhead documented.
+- 050 code supplied: larger groups/increasing population, planned 2,701 objects / 13 commits. Owner testing; outcome unreviewed, no success claim.
+- Added native transport contract, evidence ledger, bounded performance interpretation and a proposed host-authoritative HTTP relay protocol with logical identity, application acks, backpressure and unresolved-commit/crash boundaries. Updated current status/unknowns/next objective; historical failures retained.
+- Public scope: documentation and sanitized findings only. No raw logs, game binaries/resources, OVLs, saves, private endpoints/tokens or personal Windows paths.

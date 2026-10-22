@@ -1,32 +1,34 @@
 # Open questions and next experiments
 
-**Updated 2026-10-21 through diagnostic 034.** [Status](STATUS.md) · [Transport](../networking/TRANSPORT.md)
+**Updated 2026-10-22 through diagnostic 049; 050 pending review.** [Status](STATUS.md) · [Transport](../networking/TRANSPORT.md) · [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md)
 
-## Immediate blockers
+## Immediate acceptance gates
 
-1. **Transport:** What exact parameters construct CreateKeplerHttpRequest? Does it accept arbitrary/loopback URLs, and how is raw response text read? Function-valued access is verified; invocation is not.
-2. **Two real clients:** Can separately authorized clients run concurrently, load matching baselines and exchange a harmless message/ack without game edits?
-3. **Edit capture:** Where can our mod observe an ordinary player-confirmed create/move/delete without echoing remote edits or reacting to transient previews?
-4. **Identity:** How will persistent mod-owned object keys map to each client's local PlacementPartID and transient EntityID, including reload and deletion tombstones?
-5. **Recovery:** What authority, ownership, ordering, acknowledgement, durable command journal and resync rules handle disconnects, crashes and concurrent operations?
+1. **Simultaneous clients:** two independently authorized clients exchanging harmless numbered messages at the same time. Sequential A/B/A-again exchange passed; it is not this test.
+2. **Remote route:** native HTTP over an owner-controlled internet HTTPS relay, certificates/headers/timeouts and friend-friendly setup. A package was prepared, not tested with a remote friend.
+3. **Cross-client replay:** matching baselines and logical object keys; one scripted event creates separate local parts with matching resource/transform and one intended commit per peer. Test origin echo avoidance.
+4. **Edit capture:** observe an ordinary confirmed player action without shipping previews or double-applying the origin's already committed change.
+5. **Identity and recovery:** persist per-client logical-key mappings/revisions/tombstones and park checkpoint IDs; handle commit-before-ack crashes, gaps, reconnect and late join without blind CREATE replay.
 
-## Remaining coverage
+## Transport and performance coverage
 
-- Version/executable/mod hashes, packaging and licensing for reproducible distribution.
-- Multi-object groups, undo/redo, rotations/scales, different scenery and invalid placement/permission failures.
-- Repeated persistence tests, stable canonical world inventories, save metadata for mod-owned mappings.
-- Steam/profile/Cloud isolation and independently usable guest configuration.
-- Native Lua module/bridge compatibility if built-in HTTP cannot provide the required transport.
+- POST/body/header support, remote TLS behavior, redirects, compression, connection reuse and long polling remain untested. Loopback GET/text is established.
+- Request cancellation, failures during world/owner transitions, bounded queues/backpressure and soak tests.
+- Offline fresh uncached profile, Steam outage and permanent Frontier service shutdown: not established by success with a ready Kepler context and Frontier disconnected.
+- Review 050 before any claim about 100/250/500-object groups or 2,701-object parks. Measure synchronous frame stalls with a better timing basis; zero game-clock phase time is not zero cost.
+- Preserve batch transaction/undo semantics; do not coalesce dependent events merely for speed.
+- Different resources, rotations/scales, invalid placement/permissions and multiplayer undo/redo.
+- Exact executable/mod hashes, reproducible packaging and complete Steam/Cloud/guest isolation.
 
-## Answered within the tested scope
+## Answered within scope
 
-- Hierarchy creation and change-list access: diagnostics 007/008.
-- Scripted AQ_Rock_04 creation, transform, preview, cancel, commit and world lookup: 009–018.
-- Creation/movement/deletion persistence after manual reload: 019/022/025.
-- Independence of two equal-resource parts: 026/027.
-- Session-local duplicate suppression and ordering/ID-conflict rejection: 028/029.
-- Canonical replay agreement across twelve inputs in separate A/B runs: 030.
-- Lua io/os/LuaSocket unavailable in the tested environment: 031; no file roundtrip completed.
-- Five named API fields resolve as functions while nine invented names resolve as nil: 033/034. Signatures and networking behavior remain unknown.
+- Scripted local scenery create/move/delete and save/reload: 007–025.
+- Independent equal-resource objects and guarded local replay: 026–030.
+- Standard io/os/LuaSocket unavailable in the tested Lua; file roundtrip skipped: 031.
+- Native arbitrary loopback destination and raw text response: 037b–047.
+- Native HTTP usable with valid Kepler context without active Frontier connection: 043–045.
+- Actual sequential A/B message exchange: 038; HTTP-triggered local CREATE/MOVE and duplicate skips: 040–042.
+- Local full-body HTTP downloads up to 1 MiB: 046/047, not internet throughput proof.
+- Shared-token grouped creation/commit up to 50 rocks: 049; one preparation Advance per group.
 
-Historical failures remain in [LOG.md](LOG.md); they are not the current blocker. No playable co-op or live two-client synchronization is claimed.
+No playable co-op, simultaneous distributed state convergence or durable exactly-once guarantee is claimed.

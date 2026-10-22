@@ -28,3 +28,8 @@ The own Lua diagnostic created AQ_Rock_04, saved a new local park and found the 
 The tested manager path obtains Interfaces.IParkLoadSaveManager through the game environment, calls GenerateCurrentParkMetaData and SaveParkToSaveToken with the game owner plus a new local save descriptor, waits for completion and api.save.IsBusy() to clear, and checks the returned token/name. An undo Checkpoint is separate from a park save.
 
 [Diagnostic ledger and limits](../research/DIAGNOSTICS_007_034.md). This proves the tested scenery effects survive these local saves, not the full serializer format or persistent mod-owned network-ID metadata. Full Steam Cloud isolation, cross-client IDs and general persistence remain open.
+
+
+## Distributed recovery remains open (2026-10-22)
+
+Later native HTTP and grouped editor tests do not extend the save proof to network identity metadata. A park commit, relay journal and applied-command watermark are not an atomic transaction. Persist logical object keys/revisions/tombstones with an agreed checkpoint and verify reconciliation before claiming crash-safe replay or late join. [Proposed recovery rules](../networking/HTTP_SYNC_DESIGN.md).

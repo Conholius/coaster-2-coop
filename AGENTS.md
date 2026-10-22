@@ -17,7 +17,7 @@ Before working, read `README.md`, `docs/README.md`, `docs/research/STATUS.md`, `
 
 ## First engineering objective
 
-Diagnostics 007–034 have established scripted AQ_Rock_04 create/move/delete, local save/reload and session-local guarded replay. Read `docs/research/DIAGNOSTICS_007_034.md` and `docs/networking/TRANSPORT.md` before proposing the next test. Current objective: establish a supported harmless message/ack transport, then replay a validated scenery command across two actual clients. Confirmed player-edit capture, cross-client identity and durable recovery remain unproven. Do not repeat hierarchy invocation as an untested milestone or call separate A/B replay runs network synchronization.
+Diagnostics 007–049 establish scripted scenery lifecycle/local persistence, native loopback GET/text, sequential A/B relay exchange, HTTP-triggered local CREATE/MOVE and shared-token grouped creation up to 50. Read both diagnostic ledgers, `docs/networking/TRANSPORT.md`, `docs/networking/BENCHMARKS.md` and the proposed `docs/networking/HTTP_SYNC_DESIGN.md`. Current objectives: review pending 050 evidence, then simultaneous two-client messaging and validated scenery replay. Remote HTTPS, ordinary edit capture, persistent identity and recovery remain unproven. Do not repeat resolved transport-signature research or describe sequential exchange as simultaneous co-op. Planned 050 counts are not passed results.
 
 ## Notes and contribution workflow
 

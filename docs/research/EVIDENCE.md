@@ -1,6 +1,6 @@
 # Evidence index
 
-These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 034 are indexed in the later section and in [STATUS.md](STATUS.md).
+These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 049 are indexed in the later sections and in [STATUS.md](STATUS.md).
 
 | Area | Local source material | Confirmed symbols/observations | Qualification |
 | --- | --- | --- | --- |
@@ -72,3 +72,22 @@ The [detailed ledger](DIAGNOSTICS_007_034.md) distinguishes original test outcom
 Source/function anchors for the workshop, account, newsfeed, WebRequestManager and online-session investigation are in [TRANSPORT.md](../networking/TRANSPORT.md). Static findings and function existence must not be promoted to executed transport.
 
 The first 005/006 records retain their outside-Sandboxie qualification. Later log paths do not independently establish process isolation. No raw logs, decompiled scripts or private Windows paths are committed.
+
+
+## Network and batching evidence — 2026-10-22, diagnostics 035–049
+
+See the [035–049 ledger](DIAGNOSTICS_035_049.md) for per-diagnostic outcomes, sources and boundaries. These are owner-run tests and prior log reviews, not newly executed game sessions in this update.
+
+| Source anchor | Finding | Boundary |
+| --- | --- | --- |
+| Prior 035b/036 reviews and owner server/control screenshots | Lua-JS roundtrip; JS 404 without server hit; same-sandbox Python loopback success | UI bridge and control path, not external JS HTTP success |
+| Prior native Gameface / Kepler inspection | Resource-path explanation for tested JS behavior; result 19 identified as Cancelled | Static/private investigation; no general Gameface or cancellation-cause guarantee |
+| Retained original 047 worker/readStatus/Advance source | CreateKeplerHttpRequest(playerID), setters, third response table nResponseCode/sBody, Spawn/JoinAsync and relaxed context gate | Original mod code inspected, not redistributed game source; no remote HTTPS/POST proof |
+| Retained 038 A/B/A2 logs and prior server screenshot review | Actual sequential three-message exchange; server duplicate detection on A-again | No simultaneous client pair; no crash-durable relay |
+| Prior 039–042 log/server reviews | Validation counts; HTTP local CREATE/MOVE and duplicate suppression | No HTTP DELETE application or distributed exactly-once guarantee |
+| Prior 043–045 reviews | Local requests after Frontier loss / offline start with ready Kepler context | 043 recovery incomplete; no no-context/no-cache/Steam-outage proof |
+| Correct 046 online/timestamped offline reviews; prior 047 client review and retained server/source | Full bodies/tasks passed; 27 per valid 046 run, 110 in 047; bounded local latency | Excludes mislabelled 043 log and all mock logs; no internet/concurrency throughput proof |
+| Reviewed real 048/049 MAPPING/WORLD_CHECK/PHASE/SAMPLE/RESULT records | 274 unique parts, 16 commits/checkpoints and 32 world checks in each; shared completion reduces Advances | Up to 50 per group, one rock resource, no saves; game-clock and trace limitations recorded |
+| Supplied 050 code and owner's current test intent | Planned 2,701 rocks / 13 commits / 26 checks | No reviewed result; no performance conclusion yet |
+
+The [HTTP synchronization design](../networking/HTTP_SYNC_DESIGN.md) is labelled proposed. Only [observed measurements](../networking/BENCHMARKS.md) are described as passed. Private raw evidence, proprietary archives and account details remain outside commits.

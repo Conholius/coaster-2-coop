@@ -2,7 +2,7 @@
 
 [← Documentation guide](../README.md) · [Current status](../research/STATUS.md) · [Scenery research](../placement/README.md)
 
-**As of 2026-10-21.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
+**Updated 2026-10-22, through 049; 050 pending.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
 
 ## Environment and isolation boundary
 
@@ -75,16 +75,29 @@ The detailed [diagnostic ledger](../research/DIAGNOSTICS_007_034.md) records eac
 
 No tests were rerun in the game for this documentation update. Earlier results are consolidated from prior private log reviews; retained selected logs were reread.
 
-## Next experiment: transport without game edits
+## Diagnostics 035–049: native transport and grouped edits
 
-Establish exact HTTP constructor and response semantics before a native request. The initial transport test should send a harmless message to an owner-controlled endpoint and read an acknowledgement, with no editor, commit or save calls. This test has **not run**. [Investigation](../networking/TRANSPORT.md).
+See the [detailed evidence ledger](../research/DIAGNOSTICS_035_049.md), [native request contract](../networking/TRANSPORT.md) and [measurements](../networking/BENCHMARKS.md).
 
-## Not demonstrated
+| Range | Result and limit |
+| --- | --- |
+| 035b / 036 controls | Lua-JS roundtrip passed; JS external request did not reach server; independent same-sandbox Python loopback passed |
+| 037 / 037b | Early cancellation; later native GET HTTP 200 / text response / task join after initialization |
+| 038 | Sequential A/B/A-again three-message exchange; retained server recognizes repeat A sends; no simultaneous pair |
+| 039 | Sixteen downloaded validation inputs: four accepted, four each duplicate/order/conflict, no park edits |
+| 040–042 | Native HTTP CREATE/MOVE and duplicate suppression, correct positions and single intended commits |
+| 043–045 | Loopback survives Frontier loss; offline-start requests succeed after Kepler user context exists; 043 recovery incomplete |
+| 046/047 | Corrected 046 online/offline 27 each; 047 110 correct full bodies and joined tasks; local single-request timing only |
+| 048/049 | 274 unique parts, 16 commits/checkpoints, 32 world checks; shared wait reduces up-to-50 creates to one preparation Advance |
+| 050 | Larger groups/growing-park code supplied; owner testing, result not reviewed |
 
-- Simultaneous independent clients, message transport or live co-op.
-- Ordinary user-edit capture, general undo/redo, crash/reconnect recovery or persistent deduplication.
-- Complete Steam/Cloud isolation, a working second sandboxed client, or a Denuvo root cause.
-- Applicability beyond the tested base-game rock and local save workflow.
+This documentation update does not run the game. Older overwritten logs are summarized from prior reviews, not claimed as newly re-executed tests. Retained 038 logs and 047 source/server output were reread; mocks are excluded from runtime evidence.
+
+## Next experiment and unproven scope
+
+Review 050 independently, then prove harmless messaging between two simultaneous actual clients and the remote relay route. Connect one scripted scenery event only after that. [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
+
+No simultaneous/internet gameplay, ordinary player-edit capture, durable deduplication, distributed IDs/reconnect/resync or full simulation synchronization is established. Local scenery persistence does not establish cross-client recovery. Full Steam/Cloud isolation and second guest configuration remain unvalidated.
 
 ## Evidence handling
 

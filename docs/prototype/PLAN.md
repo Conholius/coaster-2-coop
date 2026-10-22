@@ -1,28 +1,29 @@
-# First prototype: proof of persistent scenery replication
+# First prototype: HTTP-delivered scenery replication
 
-> **Status update — 2026-10-21, through diagnostic 034:** Scripted scenery create/move/delete, local save/reload, independent objects and session-local guarded replay have passed. Separate A/B runs matched canonical states after twelve inputs. **Transport, simultaneous clients and real-time replication remain untested.** See [runtime ledger](../research/DIAGNOSTICS_007_034.md) and [transport investigation](../networking/TRANSPORT.md).
+> **Updated 2026-10-22 through diagnostic 049.** Local native HTTP text transport, sequential A/B messaging, HTTP-triggered local CREATE/MOVE, guarded replay and up-to-50 grouped creation are verified. **Simultaneous two-client replication, normal edit capture and distributed persistence are not.** Diagnostic 050 has no reviewed result.
 
-## Goal
+[Current facts](../research/STATUS.md) · [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md) · [Native contract](../networking/TRANSPORT.md)
 
-With two isolated PC2 clients on matching exact builds and independently loaded matching park baselines, reproduce a **confirmed** placement of one ordinary decoration prop on the second client and verify the result persists after a save/reload. This is a **plan**, not a completed test.
+## First acceptance goal
 
-## Required milestones
+With two independently authorized real PC2 clients on matching builds and park baselines, reproduce one scripted host-accepted AQ_Rock_04 event on the guest. Compare logical identity/resource/world transform and intended commit counts; local Part-IDs may differ. First run without saves. This is a plan, not a completed test.
 
-Local portions have passed for the tested rock; cross-client portions below remain acceptance criteria. Next establish harmless message/ack transport, then integrate replay. Capturing ordinary confirmed user edits is still a separate requirement.
+## Steps
 
-1. Identify retail game build, store, OS and executable SHA-256 for both clients.
-2. Isolate copies of installs/test saves and verify authorized mod-loader operation.
-3. Observe normal editor preview vs final commit. Trace function and arguments.
-4. Record a canonical operation schema with explicitly typed IDs and world transforms. Do not use ephemeral local engine IDs as network IDs.
-5. Replay a validated placement on a second instance without replacing whole-world state.
-6. Save/reload both worlds and verify equality of the target prop, including persistence and absence of duplicates.
-7. Extend to move, delete and undo/redo; document conflicts and rollback behavior.
-8. Extend the transport/replay prototype with authority, ordering, versioning and recovery, then test packet loss, duplicates, disconnects and late joining.
+1. Record exact game/mod versions and hashes privately; confirm copied-install/profile/Cloud boundaries and matching park baseline/identity manifest.
+2. Exchange harmless numbered messages concurrently over a local route, then the intended owner-controlled remote route; retain full acknowledgements and task lifecycle evidence.
+3. Establish session/epoch/version validation, authoritative ordering, immutable command-ID records, per-client logical-ID mapping and origin echo suppression.
+4. Apply one host-accepted scripted CREATE to the guest; wait for native completion and verify resource/position/mapping across two Advances before application ack.
+5. Test redelivery, response loss, order gaps, changed-content ID conflicts and stale revisions without extra effects. Stop unresolved commit outcomes rather than retrying blindly.
+6. Extend to MOVE/DELETE and independently addressed identical resources; validate error/cancel/undo ownership.
+7. Add ordinary confirmed user-edit capture as its own tested feature.
+8. Design durable journal/checkpoint/object metadata integration; only then test explicit save/reload, crash/reconnect, resync and late join. Local save tests alone are insufficient.
+9. Use measured batch/frame budgets and stress/soak tests; keep full simulation outside the first scope.
 
-## Test evidence
+## Evidence required
 
-For each test log: exact build/hashes, operation sequence, save copy IDs (private), actual logs/screenshots (private until reviewed), expected vs observed outcome, reproducibility count, failures and changes to conclusions. Do not describe automated testing until automated clients were actually exercised.
+Exact build, operation/session sequence, canonical states, command and commit counts, task completions, failures and explicit expected/observed outcomes. Keep raw logs, park files and personal paths private. Distinguish owner-run scripted diagnostics from an automated two-client suite. Protocol recovery rules in the design page are proposals until implemented and exercised.
 
-## Initial exclusions
+## Exclusions
 
-No guest/staff/economy simulation synchronization; no terrain or track editing, no ride synchronization, no public-online access, no anti-cheat bypass.
+No guest/staff/economy simulation, terrain/paths/tracks/rides, public service mutation, anti-cheat bypass or claim of playable co-op. Do not publish game dumps or tokens.
