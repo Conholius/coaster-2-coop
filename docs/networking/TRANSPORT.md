@@ -94,4 +94,4 @@ No complete decompiled scripts, bytecode or game resources are distributed in th
 
 ## Next acceptance gate
 
-Use two independently authorized real clients at the same time, with matching park baselines, first for harmless messages and then a scripted scenery command. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
+Use two independently authorized real clients at the same time, with matching park baselines, first for harmless messages and then a scripted scenery command. An internet relay package was prepared but no remote friend was available to test. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
