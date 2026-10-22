@@ -15,7 +15,7 @@ sequenceDiagram
     participant A as Host PC2 Lua
     participant R as Owner-controlled relay
     participant B as Guest PC2 Lua
-    Note over A,B: Matching baseline; native Kepler context ready
+    Note over A,B: Matching baseline and native Kepler context ready
     B->>R: Submit proposed scenery intent
     R->>A: Deliver intent for host validation
     A->>A: Validate, commit once, verify world
