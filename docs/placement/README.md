@@ -36,7 +36,7 @@ This section records the earlier **static scenery-specific editor call path**. L
 4. Save and reload; verify the object, transform and placement inventory remain correct.
 5. Repeat with move/delete; test undo and redo semantics.
 
-**Updated:** scripted create/move/delete and local persistence are now demonstrated for AQ_Rock_04 (009–025). Capturing ordinary player-confirmed edits and full undo/redo remain unverified.
+**Updated:** scripted create/move/delete and local persistence are now demonstrated for AQ_Rock_04 (009–025). Capturing ordinary player-confirmed edits remains unverified. Native live-session Undo/Redo for the tested Create/Move/Delete later passed in 056–061; cross-client history ownership remains open.
 
 ## ACSE / ForgeUtils follow-up (2026-10-20)
 
@@ -57,4 +57,10 @@ See the [full lifecycle, exact tested signatures and limitations](../research/DI
 
 ## Grouped creation update — diagnostics 048/049 (2026-10-22)
 
-Both created 274 unique rocks with 16 group previews/commits/checkpoints and 32 world checks, without diagnostic saves. Issuing all CreateNewPart requests with one shared completion token before waiting reduced tested up-to-50 groups to one preparation Advance; preview used two and commit one. This is successful grouped request submission/completion, not proof of concurrent CPU execution or universal group support. See [measurement boundaries](../networking/BENCHMARKS.md). Larger-group / growing-park diagnostic 050 is pending; its target counts are not verified.
+Both created 274 unique rocks with 16 group previews/commits/checkpoints and 32 world checks, without diagnostic saves. Issuing all CreateNewPart requests with one shared completion token before waiting reduced tested up-to-50 groups to one preparation Advance; preview used two and commit one. This is successful grouped request submission/completion, not proof of concurrent CPU execution or universal group support. See [measurement boundaries](../networking/BENCHMARKS.md). Later 050–054 verified 2,701 rocks / 13 commits with groups to 500. 067/068 add real-object register/query/Move measurements; see the [050–068 ledger](../research/DIAGNOSTICS_050_068.md).
+
+## Undo, mapping and query update — 055–068
+
+HTTP DELETE and native live-session `Undo()` / `Redo()` passed with completion-token waits and fresh entity mapping checks. 056 retained the captured Part-ID while Entity-IDs changed on native recreation. 064 retained saved object state but lost native-history availability after the tested reload; 065 instead applied version-checked Move counteractions from manually transferred action data. [Recovery/history boundaries](../networking/RECOVERY_AND_HISTORY.md).
+
+067/068 registered 2,701 actual rocks and verified 1,464 scripted moves, 84 commits and 180,370 world checks. Minimal registry records contain logical key/local Part-ID/revision/deletion state; snapshots used as expected values are diagnostic data. The tested native existence/resource/entity/transform queries remain inexpensive; repeated full scans cost proportionally more. [Timings and limitations](../networking/BENCHMARKS.md).

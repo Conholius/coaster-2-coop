@@ -1,34 +1,38 @@
 # Open questions and next experiments
 
-**Updated 2026-10-22 through diagnostic 049; 050 pending review.** [Status](STATUS.md) · [Transport](../networking/TRANSPORT.md) · [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md)
+**Updated 2026-10-22 through diagnostic 068.** [Status](STATUS.md) · [Latest ledger](DIAGNOSTICS_050_068.md) · [Recovery](../networking/RECOVERY_AND_HISTORY.md)
 
-## Immediate acceptance gates
+## Multiplayer acceptance gates
 
-1. **Simultaneous clients:** two independently authorized clients exchanging harmless numbered messages at the same time. Sequential A/B/A-again exchange passed; it is not this test.
-2. **Remote route:** native HTTP over an owner-controlled internet HTTPS relay, certificates/headers/timeouts and friend-friendly setup. A package was prepared, not tested with a remote friend.
-3. **Cross-client replay:** matching baselines and logical object keys; one scripted event creates separate local parts with matching resource/transform and one intended commit per peer. Test origin echo avoidance.
-4. **Edit capture:** observe an ordinary confirmed player action without shipping previews or double-applying the origin's already committed change.
-5. **Identity and recovery:** persist per-client logical-key mappings/revisions/tombstones and park checkpoint IDs; handle commit-before-ack crashes, gaps, reconnect and late join without blind CREATE replay.
+1. **Simultaneous clients:** harmless numbered messages between two independently authorized real clients at the same time. 038's sequential exchange is not this proof.
+2. **Remote route:** owner-controlled HTTPS relay, certificates/authentication/headers/timeouts and accessible host/join setup. A remote package was prepared, not validated by a friend test.
+3. **Replicated scenery:** matching baselines/logical IDs, one accepted scripted event applied once per intended peer with matching resource/transform and origin echo suppression.
+4. **Ordinary edit capture:** final player confirmation, preview filtering, ownership/acceptance and origin reconciliation.
+5. **Concurrent edits:** authoritative ordering, stale revisions, permissions and per-action Undo ownership across actual peers.
 
-## Transport and performance coverage
+## Recovery and persistent storage
 
-- POST/body/header support, remote TLS behavior, redirects, compression, connection reuse and long polling remain untested. Loopback GET/text is established.
-- Request cancellation, failures during world/owner transitions, bounded queues/backpressure and soak tests.
-- Offline fresh uncached profile, Steam outage and permanent Frontier service shutdown: not established by success with a ready Kepler context and Frontier disconnected.
-- Review 050 before any claim about 100/250/500-object groups or 2,701-object parks. Measure synchronous frame stalls with a better timing basis; zero game-clock phase time is not zero cost.
-- Preserve batch transaction/undo semantics; do not coalesce dependent events merely for speed.
-- Different resources, rotations/scales, invalid placement/permissions and multiplayer undo/redo.
-- Exact executable/mod hashes, reproducible packaging and complete Steam/Cloud/guest isolation.
+- Test a small custom registry through ACSE world-serialization callbacks, including load timing, schema/version mismatch and missing data; source presence is not runtime persistence proof.
+- Bind command status, revisions/tombstones and action data to the correct saved park checkpoint; restore Entity-IDs freshly.
+- Crash between commit attempt, verification, durable status and saving; unresolved-outcome handling without blind replay.
+- ACK reply lost after durable storage (distinct from 059–061's first ACK refusal/drop before storage).
+- Automatic controlled client restart, mismatched/older saves, truncated/corrupt journals, generation/epoch changes, late join and repair.
+- Safe real checkpoint compaction and tombstone retention; 066's pruning model is not durable cleanup proof.
+- General Create/Delete counteractions and full transform/property/dependency data. 065 only tested a positional Move with manually transferred checkpoint text.
 
-## Answered within scope
+## Performance and transport
 
-- Scripted local scenery create/move/delete and save/reload: 007–025.
-- Independent equal-resource objects and guarded local replay: 026–030.
-- Standard io/os/LuaSocket unavailable in the tested Lua; file roundtrip skipped: 031.
-- Native arbitrary loopback destination and raw text response: 037b–047.
-- Native HTTP usable with valid Kepler context without active Frontier connection: 043–045.
-- Actual sequential A/B message exchange: 038; HTTP-triggered local CREATE/MOVE and duplicate skips: 040–042.
-- Local full-body HTTP downloads up to 1 MiB: 046/047, not internet throughput proof.
-- Shared-token grouped creation/commit up to 50 rocks: 049; one preparation Advance per group.
+- Split 068's roughly 37 ms one-time catalogue result retrieval/search into narrower measurements; evaluate a validated lookup/cache rather than claiming a proven cache optimization.
+- Reproduce the earlier 067 transition outliers: 068 did not reproduce them in WORK and cannot identify their earlier cause retrospectively.
+- Presented frame-time capture, profiling overhead, allocation/GC attribution, camera/park-content controls, more resources and long-duration tests.
+- No linear extrapolation from 066's 100,000 synthetic records to 100,000 real objects. 067/068 stop at 2,701 simple rocks.
+- Native POST/body/headers, remote TLS, redirects, compression, connection reuse, long polling, uploads and multiple concurrent clients remain untested.
+- Request cancellation/world-owner transitions, bounded queues, backpressure and native task lifetimes under prolonged failure.
+- Fresh uncached/offline profiles, Steam outage and permanent Frontier shutdown; ready Kepler context without active Frontier connection is the tested boundary.
+- Exact package/build provenance and complete Steam/Cloud/guest isolation.
 
-No playable co-op, simultaneous distributed state convergence or durable exactly-once guarantee is claimed.
+## Answered within the tested scope
+
+Local scenery create/move/delete persistence; native loopback HTTP and text; relaxed Kepler readiness; shared-token grouped creation to 500; live-session native Undo/Redo; tested HTTP duplicate/order/ID-conflict guards; live-client recovery after ACK refusal/TCP reset/server restart; controlled saved-checkpoint client reload; absence of native history after the tested reload; positional Move counteractions; synthetic minimal/full registry measurements and real-object targeted/full checks. See the [050–068 ledger](DIAGNOSTICS_050_068.md) and [earlier transport ledger](DIAGNOSTICS_035_049.md).
+
+No distributed exactly-once, automatic general recovery or playable co-op claim follows.

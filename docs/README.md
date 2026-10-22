@@ -21,11 +21,12 @@ The project is research-first. Read **current results** before **historical inve
 | Editor hierarchy, scenery creation and undo | [Scenery placement](placement/README.md) | Runtime create/edit/delete, preview/cancel/commit |
 | Existing ACSE / ForgeUtils approaches | [Placement research](placement/ACSE_FORGEUTILS.md) | Commit-pinned public source research |
 | Lua, world and manager lifecycle | [Architecture](architecture/OVERVIEW.md) | Inspected source; lifecycle partly runtime-tested |
-| Save/load and object persistence | [Serialization](serialization/README.md) | Runtime local save/reload for create/move/delete |
+| Save/load and object persistence | [Serialization](serialization/README.md) | Local persistence and controlled saved-checkpoint client reload |
+| Recovery and Undo history | [Recovery findings](networking/RECOVERY_AND_HISTORY.md) | ACK/reset/server recovery, checkpoint reload, native-history loss and Move counteractions |
 | Dependencies, bytecode and tooling | [Modding](modding/README.md) | Source research + limited runtime loading |
 | Command transport | [Native HTTP](networking/TRANSPORT.md) | Native GET/text responses, readiness and disconnect controls |
-| Synchronization design | [Host/relay protocol](networking/HTTP_SYNC_DESIGN.md) | Proposed; simultaneous clients/recovery unproven |
-| Performance | [Measurements](networking/BENCHMARKS.md) | Local HTTP and grouped editor benchmarks 046–049 |
+| Synchronization design | [Host/relay protocol](networking/HTTP_SYNC_DESIGN.md) | Proposed integration; local recovery parts tested, simultaneous clients unproven |
+| Performance | [Measurements](networking/BENCHMARKS.md) | HTTP, grouped edits, synthetic registry and real query measurements through 068 |
 | Two-client acceptance criteria | [Prototype plan](prototype/PLAN.md) | Planned; not yet demonstrated |
 
 ## Evidence and chronology
@@ -34,7 +35,7 @@ The project is research-first. Read **current results** before **historical inve
 - [**EVIDENCE.md**](research/EVIDENCE.md): where each claim comes from and what it does **not** prove.
 - [**LOG.md**](research/LOG.md): chronological experiments, including failures and superseded hypotheses.
 - [**OPEN_QUESTIONS.md**](research/OPEN_QUESTIONS.md): active blockers, in priority order.
-- [**Runtime diagnostics**](testing/RUNTIME_TESTS.md): checkpoints through 049; ledgers [007–034](research/DIAGNOSTICS_007_034.md) and [035–049](research/DIAGNOSTICS_035_049.md). Diagnostic 050 is pending.
+- [**Runtime diagnostics**](testing/RUNTIME_TESTS.md): checkpoints through 068; ledgers [007–034](research/DIAGNOSTICS_007_034.md), [035–049](research/DIAGNOSTICS_035_049.md) and [050–068](research/DIAGNOSTICS_050_068.md).
 
 ## Ground rules
 

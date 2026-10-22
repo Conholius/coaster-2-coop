@@ -1,6 +1,6 @@
 # Persistent scenery placement: ACSE / ForgeUtils investigation
 
-Checked: 2026-10-20. **Static source research only; no PC2 runtime or save/reload test was performed.**
+Original investigation: 2026-10-20, **static source research**. Current update: 2026-10-22 through diagnostic 068. Historical blockers below were superseded by runtime scenery tests; custom-registry serializer integration remains untested. See [current status](../research/STATUS.md).
 
 ## Result
 
@@ -78,6 +78,14 @@ The earlier statement that scenery creation and commit call sites were missing i
 
 ## Later runtime update (2026-10-21)
 
-The original investigation above is **static source research**. Subsequent PC2 diagnostic **006** showed that the editor/undo API names are accessible in `tropicalworld`, and a minimal custom ACSE world component survives the park transition in a copied test installation **outside Sandboxie**. **No call to `CreateUndoOperationsHierarchy()`, editor preview, commit or save/reload occurred in those diagnostics.** Diagnostic **007**, the first planned hierarchy-construction call, remains **unrun**.
+The original investigation above is **static source research**. Subsequent PC2 diagnostic **006** showed that the editor/undo API names are accessible in `tropicalworld`, and a minimal custom ACSE world component survives the park transition in a copied test installation **outside Sandboxie**. **No call to `CreateUndoOperationsHierarchy()`, editor preview, commit or save/reload occurred in those diagnostics.** That was the historical 006 boundary. Diagnostic 007 and later creation/commit/persistence tests subsequently passed; consult the current ledgers rather than treating that old plan as unrun.
 
 For reproducible results and the historical failed component test, consult [runtime tests](../testing/RUNTIME_TESTS.md) and [current status](../research/STATUS.md).
+
+## 2026-10-22 follow-up — registry/storage alternatives
+
+The public ACSE `PlanetCoaster2` branch resolved to the same pinned commit as the component-manager source linked above during this inspection. Registration of save/load/version callbacks, `SaveEntityID` / `LoadEntityID` and shutdown unregistration are source observations. Current PC2 logs also show an ACSE load callback, but our custom registry has not passed a serializer-backed save/load test and the installed package was not proved byte-identical to that public source. Existing Planet Zoo-specific code remains a compatibility caution.
+
+The [ForgeUtils ModDB source](https://github.com/Distantz/ForgeUtils/blob/90b78c31693a473e73d621af145053c3b5fc8059/Main/forgeutils/moddb.lua) handles mod/version registration, not placed-instance/action storage. Native selection part sets do not establish a durable network ledger. No inspected alternative supplies all cross-client logical IDs, revisions, command outcomes and tombstone semantics.
+
+Derived direction: small own Lua registry plus native placement queries, with ACSE callbacks as a candidate automatic persistence layer. 066 compared synthetic records; 067/068 tested real-object lookup/update costs. [Recovery and history](../networking/RECOVERY_AND_HISTORY.md) · [Benchmarks](../networking/BENCHMARKS.md).

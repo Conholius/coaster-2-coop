@@ -1,6 +1,6 @@
 # Native HTTP transport in Planet Coaster 2
 
-**Updated 2026-10-22; runtime evidence through diagnostic 049. Diagnostic 050 is prepared / owner testing; no result is claimed.**
+**Updated 2026-10-22; transport/recovery findings through 063, benchmark review through 068.**
 
 [Current status](../research/STATUS.md) · [035–049 evidence ledger](../research/DIAGNOSTICS_035_049.md) · [Proposed synchronization](HTTP_SYNC_DESIGN.md) · [Measurements](BENCHMARKS.md)
 
@@ -94,4 +94,12 @@ No complete decompiled scripts, bytecode or game resources are distributed in th
 
 ## Next acceptance gate
 
-Use two independently authorized real clients at the same time, with matching park baselines, first for harmless messages and then a scripted scenery command. An internet relay package was prepared but no remote friend was available to test. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
+Use two independently authorized real clients at the same time, with matching park baselines, first for harmless messages and then a scripted scenery command. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
+
+## Local recovery update — diagnostics 055–063
+
+HTTP DELETE and live-session native Undo/Redo passed with duplicate/order/ID-conflict guards. 059 deliberately refused first ACK storage with 503; 060/061 reset TCP before first ACK storage. Successful repeats retained native task/request references until completion and did not repeat editor actions. All 38 HTTP tasks joined in 061, including expected failures.
+
+The tested reset response was `nativeSuccess=false`, Kepler result 3, reported status field 2, nil body. The value 2 is not an HTTP status. Treat the complete tested tuple as failure evidence; do not reinterpret every non-200 response as a TCP reset or discard still-running tasks on timeout.
+
+062 resumed a journal-backed server after an actual process exit while the client stayed alive. 063 resumed a restarted client from a completed save/manifest checkpoint. These extend local recovery evidence but do not prove arbitrary crash safety or simultaneous-client convergence. [Exact outcomes and limits](RECOVERY_AND_HISTORY.md).

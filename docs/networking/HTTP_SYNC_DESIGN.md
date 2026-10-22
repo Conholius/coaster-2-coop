@@ -1,12 +1,12 @@
 # Proposed HTTP scenery synchronization
 
-**Design / not implemented end to end. Updated 2026-10-22.** [Transport facts](TRANSPORT.md) · [Evidence](../research/DIAGNOSTICS_035_049.md) · [Measurements](BENCHMARKS.md)
+**Design / not implemented end to end. Updated 2026-10-22.** [Transport facts](TRANSPORT.md) · [Latest evidence](../research/DIAGNOSTICS_050_068.md) · [Recovery](RECOVERY_AND_HISTORY.md) · [Measurements](BENCHMARKS.md)
 
 ## Scope and evidence boundary
 
 Initial target: two players collaboratively create, move and delete supported scenery in matching parks. Exchange **accepted object changes**, not the entire park every poll. Existing thousands of unchanged objects require identity/baseline agreement, not continuous retransmission of their transforms. Full guests/staff/economy/terrain/ride simulation is outside this design; matching scenery does not imply deterministic simulation.
 
-The building blocks have passed separately: native GET/text response, sequential A/B message exchange, command validation, HTTP-triggered Create/Move, duplicate suppression, grouped creation/commit. Two simultaneous clients, ordinary player-edit capture, remote HTTPS, durable recovery and automatic resync have NOT passed. This page proposes how to connect them.
+The building blocks have passed separately: native GET/text response, sequential A/B messages, HTTP-triggered Create/Move/Delete and native Undo/Redo, guarded redelivery, grouped creation, live-client fault recovery and a controlled saved-checkpoint client reload. Two simultaneous clients, ordinary player-edit capture, remote HTTPS, automatic general durable recovery and resync have NOT passed. This page proposes their integration.
 
 ## Roles and data path
 
@@ -58,15 +58,15 @@ This schema is a proposal, not a claim that JSON, digest libraries or all transf
 6. Only then acknowledge APPLIED_AND_VERIFIED. HTTP 200 / received / queued is NOT an application acknowledgement. On a completed duplicate return the stored outcome without another editor operation.
 7. On uncertainty after commit attempt, pause replication for that operation. Do not guess failure from a disconnected response and blindly commit again.
 
-In-memory deduplication is runtime-tested only within the diagnostic session. It provides **at-most-once commit attempts in the tested lifetime**, not distributed exactly-once effects under crashes.
+In-memory deduplication survives the tested network/server failures while the client remains alive (059–062). A controlled completed-checkpoint reload restores the corresponding records in 063. Automatic arbitrary-crash-safe deduplication is not established. It provides **at-most-once commit attempts in the tested lifetime**, not distributed exactly-once effects under crashes.
 
 ## Crash and reconnect boundaries
 
 There is no demonstrated atomic transaction joining a PC2 park commit, the relay journal and mod-owned persistent metadata. A crash after native commit but before recording/acknowledging it is an ambiguous outcome. A server remembering a commandID alone cannot resolve whether a restarted client already applied it.
 
-Proposed recovery requires a durable accepted-event journal, client applied watermark, object revision/tombstones, save/baseline identity and an independently verified inventory reconciliation. Persist the logical identity manifest with a defined matching park checkpoint; its engine integration is still unproven. Reconnect resumes only after epoch/baseline/watermark agreement. On mismatch, stop edits and reconcile or load an agreed checkpoint; do not replay all CREATEs into an unknown park.
+Proposed recovery requires a durable accepted-event journal, client applied watermark, object revision/tombstones, save/baseline identity and an independently verified inventory reconciliation. Persist the logical identity manifest with a defined matching park checkpoint; a manual/server manifest pairing passed in 063, while automatic in-save mod-data integration is still unproven. Reconnect resumes only after epoch/baseline/watermark agreement. On mismatch, stop edits and reconcile or load an agreed checkpoint; do not replay all CREATEs into an unknown park.
 
-Late join should use a known compatible baseline/checkpoint plus subsequent ordered changes, not an unbounded initial event history. Test chunked inventories and repair procedures separately. Saving is a host-controlled explicit checkpoint decision, not a side effect of receiving each event. Existing scenery persistence tests do not establish this distributed metadata workflow.
+Late join should use a known compatible baseline/checkpoint plus subsequent ordered changes, not an unbounded initial event history. Test chunked inventories and repair procedures separately. Saving is a host-controlled explicit checkpoint decision, not a side effect of receiving each event. 063 establishes one controlled local checkpoint workflow, not this distributed metadata/resync workflow.
 
 ## HTTP polling, batching and backpressure
 
@@ -74,7 +74,7 @@ Begin with one request in flight per client, bounded event batches and an ordere
 
 HTTP can carry ordered operations reliably at the transport layer, but reconnects and retries still require application dedup/order/recovery. No request-response protocol makes a game commit atomic. Request delivery latency includes network RTT, poll waiting, native task scheduling, admission and the editor operation.
 
-Diagnostics 048/049 support batching **independent creates**: issue multiple requests with a shared completion token, wait once, edit each result, preview and commit once. Do not merge dependent CREATE/MOVE/DELETE events or unrelated user undo actions into a batch without explicit transaction semantics. One commit for many objects changes the undo boundary and failure handling. Larger groups can block a frame; 050 is pending, so 500-object performance is not a verified budget.
+Diagnostics 048/049 support batching **independent creates**: issue multiple requests with a shared completion token, wait once, edit each result, preview and commit once. Do not merge dependent CREATE/MOVE/DELETE events or unrelated user undo actions into a batch without explicit transaction semantics. One commit for many objects changes the undo boundary and failure handling. 050–054 passed 500-rock groups / 2,701 total rocks; 067/068 profiled real objects and targeted checks. These observations are not a universal frame budget. Large batches and repeated full inventories must remain bounded by measured work and transaction semantics.
 
 Use measurements to choose batch size/frame budget. A localhost 1 MiB response test is not a target packet size and does not establish upload throughput, multi-peer capacity or safe edit rates.
 
@@ -82,7 +82,7 @@ Use measurements to choose batch size/frame budget. A localhost 1 MiB response t
 
 Each client connects outward to an owner-controlled HTTPS relay; friends need not share a LAN and ordinarily do not need inbound game-port forwarding in this design. This is untested deployment design. The current runtime evidence is loopback plain HTTP; test native remote HTTPS, certificates, headers, timeouts and reconnect before promising a friend-ready internet mod.
 
-The diagnostic server has an in-memory store and no production security/durability. Do not expose that server unchanged. A public relay needs its own session authentication, authorization, bounded requests, replay/epoch checks, request-rate limits, retention and TLS. `SetGenerateAuthCode(false)` avoids requesting Frontier-generated auth for our endpoint; it does not authenticate our own relay. Production submission should use a defined mutation method/body and avoid sensitive query-string logging. POST/headers/upload support still need an explicit native-API test; successful GET diagnostics do not prove those capabilities.
+038 used an in-memory diagnostic relay; later 062/063 servers added limited checkpoint journals for their specific recovery tests. None is a production service with complete security/durability guarantees. Do not expose that server unchanged. A public relay needs its own session authentication, authorization, bounded requests, replay/epoch checks, request-rate limits, retention and TLS. `SetGenerateAuthCode(false)` avoids requesting Frontier-generated auth for our endpoint; it does not authenticate our own relay. Production submission should use a defined mutation method/body and avoid sensitive query-string logging. POST/headers/upload support still need an explicit native-API test; successful GET diagnostics do not prove those capabilities.
 
 The relay could be a separate service, or a local sidecar that maintains the remote link while the game uses loopback HTTP. A sidecar is an architectural option, not a tested shipped bridge. It would preserve our validated local HTTP boundary while moving remote security/recovery into original external code.
 
@@ -97,3 +97,11 @@ The relay could be a separate service, or a local sidecar that maintains the rem
 7. Load/soak tests with realistic parks and frame-time measurement, followed by supported resource/undo/transform expansion.
 
 No playable co-op or complete park synchronization is claimed until these gates are met.
+
+## Registry and Undo decisions informed by 064–068
+
+Use the engine's current placement queries with a small logical-key/Part-ID/revision registry. Keep expected-world snapshots used by diagnostics separate from required production state. At 2,701 real rocks the tested query bundles stayed inexpensive; full inventories cost proportionally more and were spread over Advances. 066's 100,000-record test is synthetic, not park capacity evidence.
+
+064 lost native Undo/Redo after the tested reload, although saving alone preserved it. Shared/cross-session history must not depend on identical native stacks. 065's Move counteractions are optional history operations with new IDs, authoritative ordering and expected revision checks; they are not engine-stack reconstruction. Automatic action-data persistence and general Create/Delete counteractions remain open.
+
+066's pruning model rejects old sequences below a checkpoint boundary after removing exact payload records. Production compaction must prove a durable checkpoint and safe retention for all consumers, tombstones and recovery paths before removing evidence. See [recovery/history](RECOVERY_AND_HISTORY.md).

@@ -33,3 +33,11 @@ The tested manager path obtains Interfaces.IParkLoadSaveManager through the game
 ## Distributed recovery remains open (2026-10-22)
 
 Later native HTTP and grouped editor tests do not extend the save proof to network identity metadata. A park commit, relay journal and applied-command watermark are not an atomic transaction. Persist logical object keys/revisions/tombstones with an agreed checkpoint and verify reconciliation before claiming crash-safe replay or late join. [Proposed recovery rules](../networking/HTTP_SYNC_DESIGN.md).
+
+## Controlled restart and history findings — 063–065
+
+063 paired two completed commands with one verified new local save and a server-held checkpoint manifest. After client restart, Phase 2 verified save identity and current world, refreshed entity mapping, restored those records, skipped two replays and committed only a new Move. The new Move was not saved. This is completed-checkpoint recovery, not arbitrary crash-safe serialization of the mod.
+
+064 observed native Undo/Redo available immediately before/after saving, then both unavailable after the tested restart. 065 kept explicit Move before/after data and manually transferred a checkpoint string; new revision-checked counteractions restored Undo/Redo effects without invoking native history. Automatic persistent action/command state is still open.
+
+The public ACSE component manager registers world-serialization callbacks and maps save/entity references; a matching ACSE load callback appears in PC2 logs. This is a concrete candidate for co-saving custom state, not a completed integration or proof that `SaveEntityID` is a peer identity. [Source anchors, recovery boundaries and next tests](../networking/RECOVERY_AND_HISTORY.md).

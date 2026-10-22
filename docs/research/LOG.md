@@ -77,3 +77,17 @@ Future entries: record date, test build + SHA-256, original symbol/source, test 
 - 050 code supplied: larger groups/increasing population, planned 2,701 objects / 13 commits. Owner testing; outcome unreviewed, no success claim.
 - Added native transport contract, evidence ledger, bounded performance interpretation and a proposed host-authoritative HTTP relay protocol with logical identity, application acks, backpressure and unresolved-commit/crash boundaries. Updated current status/unknowns/next objective; historical failures retained.
 - Public scope: documentation and sanitized findings only. No raw logs, game binaries/resources, OVLs, saves, private endpoints/tokens or personal Windows paths.
+
+## 2026-10-22 — Review through 068: scale, recovery, history and attribution
+
+- Reread retained version-marked owner logs 050–068. No game run during documentation work; earlier failed 057/060/068 runs remain failures, corrected repeats supply completion evidence.
+- 050/051: 2,701 rocks / 13 commits; minimal own logging did not materially change coarse game-clock timing. 052 introduced a performance timer and Advance monitoring. 053 reduced verification to new groups; 054 added a passing final inventory, 8,103 checks total.
+- 055–058: HTTP DELETE and local/native HTTP-driven Undo/Redo passed, with rejected duplicates/order/ID conflicts preserving state and refreshed entities.
+- 059–061: ACK refusal then real TCP resets before first ACK storage resumed without duplicate native actions. Correctly interpret native failure tuple rather than treating status field 2 as an HTTP response. Successful 061 joined all 38 tasks.
+- 062: actual journal-backed server process restart with surviving client ledger. 063: controlled client restart after one saved/sealed checkpoint; old commands skipped and only new Move committed. Arbitrary commit/status/save crash windows remain unresolved.
+- 064: native history available after saving but unavailable after tested reload. 065: manually transferred Move data enabled two new counteractions and version/ID/order/duplicate guards, not native-stack persistence.
+- 066: synthetic minimal/full registry/history comparison passed 12 combinations / 24 layouts. Real durable pruning and exact retained memory are not established.
+- 067: real 2,701-object registry, 1,464 moves / 72 groups, 84 commits and 180,370 checks passed; targeted checks stayed much cheaper than full inventories. Earlier MIXED_TRANSITION outliers lacked attribution.
+- Corrected 068: same workload; 6,867 callbacks paired, section accounting passed. One startup catalogue result-handling/search section took 37.2313 ms; WORK own/gap maxima 3.4665/21.6808 ms, no WORK gaps over 33 ms. Earlier WORK outliers did not recur; no retrospective causal proof. Instrumentation overhead explicitly retained.
+- Reviewed native-registry and ACSE/ForgeUtils alternatives. ACSE world-serialization callbacks are a source-supported automatic checkpoint candidate, not a verified custom-registry integration. ForgeUtils ModDB is a version registry. Minimal own identity/revision/status semantics remain necessary.
+- Updated overview, current status, runtime/evidence/unknowns, performance, recovery/history, placement, serialization and proposed HTTP integration. Preserved repaired Mermaid syntax. No raw logs, proprietary scripts/assets, OVLs, saves, checkpoint tokens or personal paths published.

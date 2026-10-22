@@ -2,7 +2,7 @@
 
 [← Documentation guide](../README.md) · [Current status](../research/STATUS.md) · [Scenery research](../placement/README.md)
 
-**Updated 2026-10-22, through 049; 050 pending.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
+**Updated 2026-10-22, reviewed through 068.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
 
 ## Environment and isolation boundary
 
@@ -89,16 +89,26 @@ See the [detailed evidence ledger](../research/DIAGNOSTICS_035_049.md), [native 
 | 043–045 | Loopback survives Frontier loss; offline-start requests succeed after Kepler user context exists; 043 recovery incomplete |
 | 046/047 | Corrected 046 online/offline 27 each; 047 110 correct full bodies and joined tasks; local single-request timing only |
 | 048/049 | 274 unique parts, 16 commits/checkpoints, 32 world checks; shared wait reduces up-to-50 creates to one preparation Advance |
-| 050 | Larger groups/growing-park code supplied; owner testing, result not reviewed |
+| 050–054 | 2,701 rocks / 13 commits, performance timer and reduced verification; final 054 inventory passed |
+| 055–058 | HTTP DELETE and native live-session Undo/Redo; duplicate/order/ID-conflict guards passed |
+| 059–062 | ACK refusal, real TCP resets and journal-backed server restart; live client avoided duplicate actions and joined tasks |
+| 063 | Controlled completed-checkpoint client restart: two old commands skipped; only new Move committed |
+| 064/065 | Native history absent after tested restart; manually transferred Move data supported new counteractions and conflict guards |
+| 066 | All 12 synthetic size combinations / 24 layouts passed; no world mutation |
+| 067/068 | 2,701 real registered rocks, 72 Move groups, 84 commits, 180,370 checks; corrected 068 profiling and completion passed |
 
 This documentation update does not run the game. Older overwritten logs are summarized from prior reviews, not claimed as newly re-executed tests. Retained 038 logs and 047 source/server output were reread; mocks are excluded from runtime evidence.
 
 ## Next experiment and unproven scope
 
-Review 050 independently, then prove harmless messaging between two simultaneous actual clients and the remote relay route. Connect one scripted scenery event only after that. [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
+Prove harmless messaging between two simultaneous actual clients and the remote relay route, then a scripted scenery event. Local recovery/benchmark outcomes through 068 are detailed in the [new ledger](../research/DIAGNOSTICS_050_068.md). [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
 
-No simultaneous/internet gameplay, ordinary player-edit capture, durable deduplication, distributed IDs/reconnect/resync or full simulation synchronization is established. Local scenery persistence does not establish cross-client recovery. Full Steam/Cloud isolation and second guest configuration remain unvalidated.
+No simultaneous/internet gameplay, ordinary player-edit capture, automatic general durable deduplication, distributed reconnect/resync or full simulation synchronization is established. 062 tests server restart with a surviving client ledger; 063 tests client reload from a completed saved checkpoint, not arbitrary crash recovery. Full Steam/Cloud isolation and second guest configuration remain unvalidated.
 
 ## Evidence handling
 
 Keep unredacted logs, absolute Windows user paths, game executable hashes, game binaries, mod OVL files and saves **locally**, not in this public repository. See the [evidence index](../research/EVIDENCE.md) and [chronological research log](../research/LOG.md).
+
+## Latest evidence and superseded failures
+
+The [050–068 ledger](../research/DIAGNOSTICS_050_068.md) gives per-test counts, private evidence anchors and boundaries. Failed early 057/060/068 runs remain failures; corrected repeats alone support completion claims. 064 completed successfully as a diagnostic **finding native history unavailable**, not as proof that it persisted. 065's action data were manually transferred. No game was run for this documentation update.

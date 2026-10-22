@@ -1,6 +1,6 @@
 # Diagnostics 035–049: transport, command replay and batching
 
-**Consolidated 2026-10-22.** [Earlier ledger](DIAGNOSTICS_007_034.md) · [Status](STATUS.md) · [Native HTTP](../networking/TRANSPORT.md) · [Benchmarks](../networking/BENCHMARKS.md)
+**Consolidated 2026-10-22; historical scope 035–049. Later reviewed outcomes: [050–068](DIAGNOSTICS_050_068.md).** [Earlier ledger](DIAGNOSTICS_007_034.md) · [Status](STATUS.md) · [Native HTTP](../networking/TRANSPORT.md) · [Benchmarks](../networking/BENCHMARKS.md)
 
 ## Evidence method
 
@@ -31,7 +31,7 @@ Reported environment: Steam/Windows PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 2
 | 047 | 110/110 requests/full bodies/task joins/reference releases; 10 warmups + 100 mixed measurements; server sizes/sequences matched | Local, one request in flight, no uploads/editor actions/concurrent clients |
 | 048 | 274 unique rocks, 16 group commits/checkpoints, 32 verified world checks; preparation grew by one Advance per rock | Sequential create/wait per object; no save |
 | 049 | Same 274 parts / 16 commits / 32 checks; all requests issued before shared-token wait; one preparation Advance per group, four pipeline Advances | Grouped creation tested to 50; no large-park/internet proof |
-| 050 | Larger groups and growing population test code supplied; owner testing | No reviewed outcome; 2,701 objects / 13 commits are planned, not observed |
+| 050 handoff | Originally pending at this ledger cutoff; subsequently passed and reread | See the [050–068 ledger](DIAGNOSTICS_050_068.md) for reviewed results |
 
 ## Concrete source and symbol anchors
 

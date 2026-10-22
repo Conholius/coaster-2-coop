@@ -1,6 +1,6 @@
 # Planet Coaster 2 — Real-Time Co-op Research
 
-> **Project status — 2026-10-22, verified through diagnostic 049:** Native HTTP GET/text responses, sequential A/B message exchange, HTTP-triggered scenery Create/Move with duplicate suppression, and grouped creation/commit are verified in the tested setup. Earlier local create/move/delete save/reload tests passed. **No playable co-op or simultaneous two-client synchronization yet. Diagnostic 050 is pending review.**
+> **Project status — 2026-10-22, reviewed through diagnostic 068:** Local native HTTP scenery commands, live-session Undo/Redo, ACK/reset/server-restart recovery and a controlled saved-checkpoint client restart are verified. A minimal registry passed with 2,701 real rocks and 1,464 moves; detailed timing and recovery limits are documented. **No playable co-op or simultaneous two-client synchronization yet.**
 
 We are investigating how two players might build in the same **Planet Coaster 2** park in real time. The next network goal is a harmless message exchange between two simultaneously running clients, followed by replication of a validated scenery command. Sequential A/B exchange already works. Guests, rides, terrain, economy and full simulation synchronization remain outside the initial scope.
 
@@ -16,8 +16,11 @@ We are investigating how two players might build in the same **Planet Coaster 2*
 | Ordered commands, duplicates and conflicts | **Verified locally:** 028/029; separate A/B replay states matched after twelve inputs in 030. |
 | Native HTTP transport | **Verified:** owner-controlled loopback GET, HTTP status and text response via Kepler; active Frontier connection is not required once context is ready (037b–047). |
 | Relay message exchange | **Verified sequentially:** A/B/A-again exchanged three messages each through a retained local server (038); simultaneous/internet test pending. |
-| HTTP command application | **Verified in one client:** CREATE, MOVE and duplicate redelivery without extra commits (040–042). |
-| Grouped creation | **Verified:** shared completion token, 274 rocks / 16 commits / 32 world checks; tested groups up to 50 (049). |
+| HTTP command application | **Verified in one client:** CREATE/MOVE/DELETE and Undo/Redo, with tested duplicate/order/ID-conflict guards (040–042, 055–061). |
+| Grouped creation | **Verified for AQ_Rock_04:** 2,701 rocks / 13 commits, groups up to 500 (050–054). |
+| Recovery | **Local controlled tests passed:** ACK refusal, TCP resets, journal-backed server restart and saved-checkpoint client restart (059–063); arbitrary crash safety remains open. |
+| Native history after reload | **Unavailable in the tested restart (064).** Move counteractions work from manually transferred action data (065). |
+| Registry and performance | **Passed:** synthetic minimal/full registry tests to 100,000 entries (066), real-object queries/moves with 2,701 rocks (067/068). |
 | Send a scenery edit between two game clients | **Not implemented or tested.** |
 
 The successful 005/006 logs came from a **copied test installation launched outside Sandboxie**. They establish PC2 behavior in that copied installation, **not** validation of the fully sandboxed launch path. A separate Sandboxie setup is documented below. See the [runtime test record](docs/testing/RUNTIME_TESTS.md).
@@ -26,7 +29,7 @@ The successful 005/006 logs came from a **copied test installation launched outs
 
 - **[Documentation guide](docs/README.md)** — a map of the project by topic.
 - **[Current research status](docs/research/STATUS.md)** — concise verified findings, limitations and next milestone.
-- **[Runtime tests (005–049)](docs/testing/RUNTIME_TESTS.md)** — what was actually tested, failures and controls.
+- **[Runtime tests (005–068)](docs/testing/RUNTIME_TESTS.md)** — what was actually tested, failures and controls.
 - **[Scenery placement and undo](docs/placement/README.md)** — the path toward creating a durable park object.
 - **[Sandboxie test setup](docs/ISOLATED-INSTALLATION.md)** — separate host/guest boxes, token compatibility and isolation caveats.
 - **[Prototype plan](docs/prototype/PLAN.md)** — acceptance criteria for one replicated scenery part.
@@ -37,9 +40,9 @@ For historical experiments and traceability: [research log](docs/research/LOG.md
 
 Our component now uses the scenery hierarchy, create/edit/destroy operations, completed previews and single commits. Creation, movement and deletion were checked after local save/manual reload. Two identical rocks can be addressed independently. Commands reject tested ordering errors and conflicting ID reuse. See the [007–034 diagnostic ledger](docs/research/DIAGNOSTICS_007_034.md).
 
-Diagnostic 030 matched canonical states without networking. Diagnostic 038 later exchanged actual messages through a server between sequential game runs; it still does not establish a simultaneous client pair. [Native HTTP transport](docs/networking/TRANSPORT.md) now works in the tested local setup. The next gaps are simultaneous/remote clients, confirmed user-edit capture, persistent identity and recovery.
+Diagnostic 030 matched canonical states without networking. Diagnostic 038 later exchanged actual messages through a server between sequential game runs; it still does not establish a simultaneous client pair. [Native HTTP transport](docs/networking/TRANSPORT.md) now works in the tested local setup. The next gaps are simultaneous/remote clients, confirmed user-edit capture and automatic durable recovery beyond the completed-checkpoint tests.
 
-Read the [035–049 evidence ledger](docs/research/DIAGNOSTICS_035_049.md), [transport/editor measurements](docs/networking/BENCHMARKS.md) and [proposed HTTP synchronization design](docs/networking/HTTP_SYNC_DESIGN.md). The architecture is a proposal, not implemented end-to-end synchronization.
+Read the [050–068 evidence ledger](docs/research/DIAGNOSTICS_050_068.md), [recovery/history findings](docs/networking/RECOVERY_AND_HISTORY.md), [035–049 evidence ledger](docs/research/DIAGNOSTICS_035_049.md), [transport/editor measurements](docs/networking/BENCHMARKS.md) and [proposed HTTP synchronization design](docs/networking/HTTP_SYNC_DESIGN.md). The architecture is a proposal, not implemented end-to-end synchronization.
 
 An earlier custom world component caused a crash during the menu-to-park transition. A later minimal component that included `Shutdown()` passed that transition; because other probes were removed at the same time, **we cannot attribute the fix solely to `Shutdown()`**. Full history: [runtime tests](docs/testing/RUNTIME_TESTS.md).
 
@@ -59,7 +62,8 @@ This repository contains our own notes, not redistributed game binaries, assets,
 | Editing / undo / creation | [Placement](docs/placement/README.md) and [ACSE + ForgeUtils research](docs/placement/ACSE_FORGEUTILS.md) |
 | Command transport | [Native HTTP contract and service dependence](docs/networking/TRANSPORT.md) |
 | Proposed replication | [HTTP synchronization, identity and recovery](docs/networking/HTTP_SYNC_DESIGN.md) |
-| Performance | [HTTP and grouped-editor measurements](docs/networking/BENCHMARKS.md) |
+| Performance | [HTTP, editor, registry and query measurements](docs/networking/BENCHMARKS.md) |
+| Recovery and history | [ACKs, checkpoints and counteractions](docs/networking/RECOVERY_AND_HISTORY.md) |
 | Saving / persistence | [Serialization](docs/serialization/README.md) |
 | Tools and decompilation | [Modding references](docs/modding/README.md) |
 | Contribution / evidence rules | [AGENTS.md](AGENTS.md) |

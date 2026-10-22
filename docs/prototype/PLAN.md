@@ -1,6 +1,6 @@
 # First prototype: HTTP-delivered scenery replication
 
-> **Updated 2026-10-22 through diagnostic 049.** Local native HTTP text transport, sequential A/B messaging, HTTP-triggered local CREATE/MOVE, guarded replay and up-to-50 grouped creation are verified. **Simultaneous two-client replication, normal edit capture and distributed persistence are not.** Diagnostic 050 has no reviewed result.
+> **Updated 2026-10-22 through diagnostic 068.** Local native HTTP scenery commands, live-session native Undo/Redo, guarded redelivery, controlled server/checkpoint-client recovery and real-object register/query measurements passed. **Simultaneous two-client replication, normal edit capture and automatic general distributed persistence have not passed.**
 
 [Current facts](../research/STATUS.md) · [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md) · [Native contract](../networking/TRANSPORT.md)
 
@@ -17,7 +17,7 @@ With two independently authorized real PC2 clients on matching builds and park b
 5. Test redelivery, response loss, order gaps, changed-content ID conflicts and stale revisions without extra effects. Stop unresolved commit outcomes rather than retrying blindly.
 6. Extend to MOVE/DELETE and independently addressed identical resources; validate error/cancel/undo ownership.
 7. Add ordinary confirmed user-edit capture as its own tested feature.
-8. Design durable journal/checkpoint/object metadata integration; only then test explicit save/reload, crash/reconnect, resync and late join. Local save tests alone are insufficient.
+8. Extend the local 062/063 journal/completed-checkpoint results to automatic registry storage, ambiguous crash windows, cross-client checkpoint agreement, resync and late join. Local controlled save/reload is insufficient for general recovery.
 9. Use measured batch/frame budgets and stress/soak tests; keep full simulation outside the first scope.
 
 ## Evidence required
@@ -27,3 +27,7 @@ Exact build, operation/session sequence, canonical states, command and commit co
 ## Exclusions
 
 No guest/staff/economy simulation, terrain/paths/tracks/rides, public service mutation, anti-cheat bypass or claim of playable co-op. Do not publish game dumps or tokens.
+
+## Implementation decisions supported by later tests
+
+Use minimal logical identity/revision records and targeted native verification. Keep grouped transaction boundaries and completion waits. Native history may be empty after reload; cross-session Move counteractions are an optional feature needing its own persisted data/ownership rules. Profile catalogue startup separately from steady-state edits. See [recovery/history](../networking/RECOVERY_AND_HISTORY.md), [benchmarks](../networking/BENCHMARKS.md) and [050–068](../research/DIAGNOSTICS_050_068.md).

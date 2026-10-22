@@ -1,6 +1,6 @@
 # Evidence index
 
-These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 049 are indexed in the later sections and in [STATUS.md](STATUS.md).
+These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 068 are indexed in the later sections and in [STATUS.md](STATUS.md).
 
 | Area | Local source material | Confirmed symbols/observations | Qualification |
 | --- | --- | --- | --- |
@@ -91,3 +91,24 @@ See the [035–049 ledger](DIAGNOSTICS_035_049.md) for per-diagnostic outcomes, 
 | Supplied 050 code and owner's current test intent | Planned 2,701 rocks / 13 commits / 26 checks | No reviewed result; no performance conclusion yet |
 
 The [HTTP synchronization design](../networking/HTTP_SYNC_DESIGN.md) is labelled proposed. Only [observed measurements](../networking/BENCHMARKS.md) are described as passed. Private raw evidence, proprietary archives and account details remain outside commits.
+
+## Scale, recovery and profiling — diagnostics 050–068, reviewed 2026-10-22
+
+The retained private version-marked logs were reread for this update. [Per-test outcomes and timestamp anchors](DIAGNOSTICS_050_068.md). No game was run and no raw logs/saves/dumps were published.
+
+| Evidence | Finding | Boundary |
+| --- | --- | --- |
+| 050–054 logs and own diagnostic timing/check logic | 2,701 rocks / 13 commits, timer validation, 33,726→5,402 checks then 8,103 with final audit | One resource; frame clock versus performance timer; not a universal frame budget |
+| 055–058 successful logs | HTTP DELETE/native Undo/Redo, immutable duplicate/order/ID conflict guards, refreshed entities | Session-local, no automatic global history |
+| 059–061 logs plus previously reviewed server fault output | 503 ACK refusal and TCP-reset-before-ACK-storage redelivery without duplicate native effects | Live-client ledger; loss after stored ACK still distinct |
+| 062 game log and prior server journal/restart review | Changed server generation/boot and resumed cursor; one duplicate skipped, 31 tasks joined | Server restart only, not client-crash atomicity |
+| Matched 063 Phase 1/2 logs and prior server manifest review | One new local saved checkpoint, two restored records, fresh entity mapping, only new Move committed | Controlled completed checkpoint; unsaved runtime state not folded into saved checkpoint |
+| 064 Phase 1/2 | Undo/Redo true after save, false after tested restart; loaded object state correct | Diagnostic completion is not native-history persistence success |
+| 065 Phase 1/2 | Explicit positional Move data and two new counteractions; revision/ID/order/duplicate guards | Manual checkpoint transfer; no native-stack reconstruction or automatic mod storage |
+| 066 | 24 synthetic minimal/full variants passed, 100,000-record scales | Not 100,000 physical scenery objects or isolated memory attribution |
+| 067 | Real registry/native queries, 72 Move groups, 180,370 checks | Transition maxima aggregated; not paired causal evidence |
+| Corrected 068 | 6,867 paired callbacks, exclusive accounting, 37.23 ms catalogue section, WORK callback/gap maxima 3.47/21.68 ms | Additional profiler overhead; catalogue materialization/search not separated; no retrospective explanation of 067 outliers |
+| ACSE public source at 8a843e61bcb57779778536e635d334d882cee7b1, component manager Init / WorldSerialisationClient_Save / Load / Shutdown | Registered world-save/load callbacks and SaveEntityID/LoadEntityID mapping | Installed load callback observed; custom-registry integration and source/package identity still unproven |
+| ForgeUtils moddb.lua at 90b78c31693a473e73d621af145053c3b5fc8059 | Mod/version registration, not instance/action storage | No native replacement for all synchronization semantics found in inspected material |
+
+Source-function links are in [ACSE/ForgeUtils](../placement/ACSE_FORGEUTILS.md) and [recovery/history](../networking/RECOVERY_AND_HISTORY.md). The supplied API inventory is labelled 1.0.6.429191 and prefab dumps include 1.10.2.906765; current runtime logs identify 1.11.4.1011357. Presence in an older inventory is not sufficient behavior evidence for the current build.
