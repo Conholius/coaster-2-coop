@@ -91,3 +91,19 @@ Future entries: record date, test build + SHA-256, original symbol/source, test 
 - Corrected 068: same workload; 6,867 callbacks paired, section accounting passed. One startup catalogue result-handling/search section took 37.2313 ms; WORK own/gap maxima 3.4665/21.6808 ms, no WORK gaps over 33 ms. Earlier WORK outliers did not recur; no retrospective causal proof. Instrumentation overhead explicitly retained.
 - Reviewed native-registry and ACSE/ForgeUtils alternatives. ACSE world-serialization callbacks are a source-supported automatic checkpoint candidate, not a verified custom-registry integration. ForgeUtils ModDB is a version registry. Minimal own identity/revision/status semantics remain necessary.
 - Updated overview, current status, runtime/evidence/unknowns, performance, recovery/history, placement, serialization and proposed HTTP integration. Preserved repaired Mermaid syntax. No raw logs, proprietary scripts/assets, OVLs, saves, checkpoint tokens or personal paths published.
+
+## 2026-10-23 — Catalogue refinement, simultaneous clients and request latency through 082
+
+- Reread retained private results and original diagnostic code; reconciled current pages with 069–082. No game runs or game/save modifications performed for the documentation update.
+- 069 isolates 32.5976 ms full-result materialization from 4.2579 ms first scan over 7,263 rows. 070 targeted queries pass 110/110 without the giant catalogue result; old roughly 37 ms combined-section ambiguity is narrowed.
+- Later 038 repeat supplies simultaneous local numbered-message evidence. 071–074 extend scripted Create/Move/Delete/native Undo/Redo and duplicates to both local clients.
+- 075/076 demonstrate first-ACK refusal/TCP abort recovery on both clients without repeated effects. 077 survives a resumed server process restart. 078 restores B's deliberately saved checkpoint while A remains alive; only new Move commits after restore.
+- Corrected 079 observes an actual ordinary host commit using the ForgeUtils hook; B creates once and skips a duplicate. 080/081 remove the diagnostic placement-tool-exit gate and keep A's distinct next preview active and local.
+- 080's 591.284 ms is host-observed verified application confirmation, not guest commit or pure HTTP. 081 measures B commit invocation/wait 0.017/16.231 ms, command receipt to completed commit 136.577 ms and host confirmation 2239.214 ms.
+- Earlier 082 attempts ended on world deactivation, with pending tasks and no full Python/control comparison; a restarted Python participant also hit Wrong phase order against an already advanced server. These are excluded from successful completion evidence.
+- Added phase start/end progress without per-probe timing output. Completed 082 passes all 14 phases and 1200 probes: A480/B600/P120, native tasks A552/B646 joined, zero bad/unmatched/open probe connections, all four completions true.
+- Approximately one-second native calls develop during Phase 3 and persist on B alone/shared/separate with either backlog. Guest Python stays fast; server accepted-handler/write sections cannot explain the delay. Exact Kepler/TCP cause and any fixed request quota remain unknown.
+- Next proposal: spacing/count/recovery-pause comparisons with defined request history, followed by network timing if needed; manual Move/Delete capture remains a separate priority.
+- Updated the README, status, evidence, open questions, transport/design/recovery/performance/prototype and setup notes. Raw game archives, personal paths and private logs remain unpublished. No playable internet co-op, lobby integration, full simulation or arbitrary-crash exactly-once claim.
+
+See [069–082 ledger](DIAGNOSTICS_069_082.md) and [080–082 latency analysis](../networking/HTTP_LATENCY_080_082.md).

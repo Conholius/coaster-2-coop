@@ -41,3 +41,9 @@ Later native HTTP and grouped editor tests do not extend the save proof to netwo
 064 observed native Undo/Redo available immediately before/after saving, then both unavailable after the tested restart. 065 kept explicit Move before/after data and manually transferred a checkpoint string; new revision-checked counteractions restored Undo/Redo effects without invoking native history. Automatic persistent action/command state is still open.
 
 The public ACSE component manager registers world-serialization callbacks and maps save/entity references; a matching ACSE load callback appears in PC2 logs. This is a concrete candidate for co-saving custom state, not a completed integration or proof that `SaveEntityID` is a peer identity. [Source anchors, recovery boundaries and next tests](../networking/RECOVERY_AND_HISTORY.md).
+
+## Two-client completed-checkpoint extension — 078
+
+Guest B saved one new local checkpoint after Create/Move, restarted while Host A and the relay remained alive, validated the matching save/checkpoint, refreshed native Entity-ID mapping and restored two applied command records. Replayed old effects were skipped; only the new Move to (20,5,10) committed after reload. B saved once in Phase 1 and did not save again in Phase 2. [Per-phase counts and limits](../research/DIAGNOSTICS_069_082.md).
+
+This is controlled checkpoint recovery, not automatic ACSE custom-registry serialization, arbitrary crash safety or a final guest-save policy. The intended product may use host-controlled saving and a lobby; those UI/world-transfer/metadata workflows are still unverified.

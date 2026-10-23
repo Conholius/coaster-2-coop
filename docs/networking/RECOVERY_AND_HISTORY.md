@@ -1,6 +1,6 @@
 # Recovery, object identity and undo history
 
-**Evidence through diagnostic 068, reviewed 2026-10-22.** [Ledger](../research/DIAGNOSTICS_050_068.md) · [Proposed protocol](HTTP_SYNC_DESIGN.md) · [Serialization](../serialization/README.md)
+**Evidence through diagnostic 082, reviewed 2026-10-23.** [Two-client ledger](../research/DIAGNOSTICS_069_082.md) [Ledger](../research/DIAGNOSTICS_050_068.md) · [Proposed protocol](HTTP_SYNC_DESIGN.md) · [Serialization](../serialization/README.md)
 
 ## Three different kinds of state
 
@@ -21,7 +21,19 @@ An Undo command can be DONE while the original action is UNDONE. A relay ACK is 
 
 063 verifies old command **payloads** against checkpoint records while verifying the **current** world against the checkpoint's latest state. The original Create position is not expected to be the current position after a checkpointed Move. The later unsaved Move is runtime state, not an update to the saved checkpoint.
 
-These are single-client local tests. They do not establish simultaneous peer recovery, distributed exactly-once effects, arbitrary client-crash safety, late join or automatic repair of a mismatched save.
+059–063 are single-client local tests. Later 075–078 extend controlled ACK/reset/server and checkpoint-client recovery to two simultaneously running local clients. Neither set establishes distributed exactly-once effects, arbitrary client-crash safety, late join or automatic repair of a mismatched save.
+
+## Controlled two-client extension — 074–078
+
+074 applies nine unique Create/Move/Delete/Undo/Redo commands, each delivered twice, on both clients. Each client retains three commits, three Undo and three Redo calls; refreshed Entity-IDs are checked.
+
+075 refuses each first ACK before storage; 076 aborts those ACK TCP connections. Each client recovers with nine unique effects and nine duplicates. A server-side premature wfile.close cleanup bug was removed separately; no repeated native action was needed.
+
+077 restarts the server with its retained journal while both clients live. Generation 2 is observed; each client has one replay duplicate and nine unique effects, with all 98/70 tasks joined on A/B.
+
+078 restarts B while A and the relay stay alive. B Phase 1 creates/moves once, saves exactly one new local checkpoint and finishes the phase. Phase 2 validates that checkpoint, restores two applied records/local mappings, skips old effects and commits only a new Move to (20,5,10). A has three total commits, B has two before reload and one afterward; no Phase 2 save. Refreshed Entity-ID and preserved loaded Part-ID are local observations, not globally transferable identities.
+
+The successful B Phase 1 deliberately reports Phase1Completed=true and overall Completed=false; overall completion is reached after Phase 2. This is not a general guest-save policy or a transactional shared checkpoint service. [Counts and evidence](../research/DIAGNOSTICS_069_082.md).
 
 ## Remaining ambiguous window
 

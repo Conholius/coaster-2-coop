@@ -1,43 +1,56 @@
 # Current research status
 
-**Updated 2026-10-22; reviewed runtime evidence through diagnostic 068. No playable co-op or simultaneous two-client synchronization yet.**
+**Updated 2026-10-23; reviewed through diagnostic 082. Two local clients and manual host Create replication passed. No released playable co-op or full simulation synchronization.**
 
-[Overview](../../README.md) · [Runtime tests](../testing/RUNTIME_TESTS.md) · [Latest ledger](DIAGNOSTICS_050_068.md) · [Measurements](../networking/BENCHMARKS.md) · [Recovery](../networking/RECOVERY_AND_HISTORY.md)
+[Overview](../../README.md) · [Runtime tests](../testing/RUNTIME_TESTS.md) · [Latest ledger](DIAGNOSTICS_069_082.md) · [HTTP latency](../networking/HTTP_LATENCY_080_082.md) · [Design](../networking/HTTP_SYNC_DESIGN.md)
 
 ## Verified in a running game
 
-Reported setup: Windows/Steam, PC2 **1.11.4.1011357**, ACSE **0.729**, ForgeUtils **2.7.0**, ACSEDebug **0.014**. Public executable/package hashes are not established. These are owner-run scripted diagnostics, not an automated simultaneous-client suite.
+Reported environment: Windows/Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 2.7.0, ACSEDebug 0.014. Public executable/package hashes are not established. Tests are owner-run diagnostics, not an automated multiplayer QA suite.
 
-- **007–030:** AQ_Rock_04 scenery hierarchy/create/edit/delete/preview/cancel/commit, local save/reload, independent equal-resource objects and guarded canonical replay in separate A/B runs.
-- **035b–047:** Lua/JS bridge; native Kepler GET/text transport, complete bodies/task joins, ready context without active Frontier connection; sequential local relay exchange, not simultaneous clients. HTTP loopback downloads up to 1 MiB passed.
-- **048–054:** shared completion-token batches, up to 500 rocks per group and 2,701 rocks / 13 commits. Performance timer and Advance monitoring distinguish work from waits. New-group verification reduced checks; final inventory passed.
-- **055–058:** HTTP DELETE, native live-session Undo/Redo for Create/Move/Delete, fresh entity mappings; tested duplicate/order/ID-conflict rejection without extra native changes.
-- **059–062:** refused ACKs, real TCP resets and one journal-backed server restart recovered without duplicate native actions while the client ledger remained alive. All tasks joined in successful runs.
-- **063:** controlled client restart after a completed saved checkpoint: mappings/command records restored, two old commands skipped, only a new Move committed. Not arbitrary crash recovery.
-- **064:** saving preserved native Undo/Redo availability in the live session; after the tested restart both were unavailable, while object position/identity restored correctly.
-- **065:** manually transferred saved Move data supported Undo/Redo effects through two new version-checked Move counteractions; duplicates/order/ID/version conflicts rejected. No native Undo/Redo calls in Phase 2; no automatic mod persistence yet.
-- **066:** 12 synthetic registry/history-size combinations, 24 minimal/full variants passed through 100,000 records of each kind. Minimal lookups/updates remained cheap; allocations/building had occasional spikes.
-- **067/068:** 2,701 real registered rocks, 72 Move groups / 1,464 object moves, 84 commits and 180,370 world checks passed. Final positions/versions matched. Native query bundles remained inexpensive in this setup; repeated full scans cost more than targeted checks.
-- **068 profiling:** largest WORK callback 3.4665 ms, largest WORK Advance gap 21.6808 ms, none above 33 ms. A 37.2776 ms STARTUP callback was localized to catalogue result retrieval/search; it was not an ongoing edit cost.
+- **007–034:** local hierarchy/Create/Move/Delete, explicit commits, save/reload, independent identical resources and guarded separate-run replay.
+- **035–047:** native loopback GET/text and relaxed Kepler readiness. Tested requests work without active Frontier connectivity once a valid Kepler user context exists. Original 038 was sequential; its later tropical-park repeat passed simultaneous numbered exchange.
+- **048–054:** batching, shared completion tokens, 2,701 rocks / 13 commits, groups up to 500, performance timing and targeted/final audits.
+- **055–065:** local native Undo/Redo, validation, controlled ACK/reset/server and completed-checkpoint client recovery; native history absent after the tested reload. Positional Move counteractions from manually transferred data worked.
+- **066–068:** synthetic registries to 100,000 entries; 2,701 real registered rocks, 1,464 moves, 84 commits and 180,370 checks. Synthetic entry counts are not physical-object capacity.
+- **069:** full 7,263-row GetAllResults 32.5976 ms, first Lua search 4.2579 ms. Twenty retained-table searches averaged 3.9730 ms.
+- **070:** 110 targeted known/unknown queries passed with no full catalogue fetch/search; maximum own callback 0.1188 ms and paired Advance gap 18.5428 ms.
+- **071–074:** two simultaneous local clients each applied scripted Create/Move/Delete and native Undo/Redo, with matching tested world state and unchanged duplicate effects.
+- **075–077:** both clients survived refused first ACKs, real TCP aborts and a controlled journal-backed server restart without repeating applied native actions.
+- **078:** Guest B saved one new checkpoint, restarted while Host/server remained alive, restored records/mappings, skipped old effects and applied only a new Move. This is a controlled completed-checkpoint workflow.
+- **Corrected 079:** an actual ordinary host editor commit was captured and replicated to B once; its duplicate was skipped.
+- **080/081:** that confirmed placement replicates while the distinct next preview on A remains local and active in all sampled observations. Neither test sends an unconfirmed preview.
+- **082:** all 14 phases and 1,200 probes passed: A 480, B 600, sandboxed Python 120; no bad bodies, all native tasks joined and all participants/server completed. No editor or save calls.
+
+## Current latency finding
+
+**Observed:** 080 took 591.284 ms from original host commit return to confirmation on A; 081 took 2,239.214 ms. These include proof/poll/verification gates. In 081, the B commit call was 0.017 ms, completion wait 16.231 ms, and command reception to completed commit 136.577 ms.
+
+**Observed:** 082 starts with fast single-client probes; during the shared phase requests develop approximately one-second tails. Later B medians remain about 944–947 ms even alone, with a larger backlog and on a separate listener. The delay is inside RunKeplerRequest, not worker dispatch or Join. Server processing/write sections remain fast; Guest Python medians are 0.94–0.99 ms, max total 24.04 ms. [Full measurements and limits](../networking/HTTP_LATENCY_080_082.md).
+
+**Hypothesis:** request-history-dependent pacing, limiting or another internal request-path wait. No fixed quota, limiting scope, Frontier policy, TCP retransmission cause or exact Kepler implementation has been demonstrated. Time before server accept and delayed completion after reply remain unresolved.
 
 ## Derived design direction
 
-Use a small mod-owned logical identity/revision registry, fresh native lookups, bounded ordered changes and application acknowledgements. Keep history bounded by a verified checkpoint policy. Prefer checking changed objects and distributing occasional full audits. HTTP remains a credible transport candidate; the local tests do not establish an internet edit-rate budget or full simulation synchronization.
+Use a minimal logical-key/local-Part-ID/revision registry, immutable command status, fresh Entity-ID lookups, ordered accepted events and application acknowledgements. Transmit changed supported objects rather than continuously retransmitting every unchanged object. Keep sampled verification and recovery outside the delivery-critical path where safely validated; retain native completion and duplicate guards.
 
-Native Undo after a reload is not a safe recovery primitive. Command status is required for replay safety; optional cross-session Undo can use separately persisted action data and revision-checked counteractions. ACSE world-serialization callbacks are a source-supported persistence candidate, not yet a passed custom-registry integration.
+HTTP remains a candidate. Kepler's observed request behavior must be measured separately from HTTP as a protocol. Adaptive polling, bounded batching, long polling, persistent connections and a local sidecar are options to test, not proven fixes. Fewer Advances are not by themselves an optimization target: distinguish CPU work, completion observation, verification and visual frames.
 
 ## Not demonstrated
 
-- Two simultaneous independently authorized clients, remote HTTPS, actual replicated scenery convergence or playable co-op.
-- Capture/acceptance of ordinary player-confirmed edits and suppression of origin/remote echo.
-- Automatic durable registry/history integration, arbitrary commit-before-recording client crash recovery, mismatched-save repair, late join or resync.
-- Distributed exactly-once effects or atomicity across native commit, relay journal and park save.
-- Broad resource, rotation/scale, groups/dependencies, terrain/path/track/ride/economy/AI support or multiplayer Undo ownership.
-- Actual presented-frame measurement, long soak tests, 100,000 real scenery objects or a universal capacity limit.
-- Steam-independent/cache-free startup, permanent service-outage operation, complete Cloud/save isolation or a validated second Sandboxie guest.
+- Remote HTTPS/friend testing, authentication, uploads, long polling or persistent-connection behavior.
+- General ordinary manual Move/Delete capture, repeated/cancelled placements, arbitrary resources/full world transforms, groups and dependencies.
+- Simultaneous conflicting edits, authoritative ownership and multiplayer Undo policy.
+- Automatic in-save mod-registry persistence, arbitrary client-crash atomicity, mismatched-save repair, late join or resync.
+- A production host/join lobby, complete automatic shared-save workflow or released playable co-op.
+- Full guest/staff/economy/terrain/path/track/ride simulation, universal capacity or presented-frame guarantees.
+- Steam/cache/service-shutdown independence or complete Cloud/save/account isolation.
 
 ## Next milestones
 
-Separate catalogue result materialization from its Lua search before optimizing that one-time startup path. For multiplayer, prove simultaneous harmless messaging, then a scripted scenery event with explicit authority, mappings and origin suppression. Test automatic serializer-backed checkpoint storage and ambiguous crash windows separately. The [HTTP design](../networking/HTTP_SYNC_DESIGN.md) remains a proposal connecting locally tested components.
+1. Vary request spacing/count and recovery pauses; distinguish pre-connect delay from post-response native completion, using a TCP trace if needed.
+2. Extend actual manual host capture to Move/Delete, then repeated placement, cancellation and Undo ownership.
+3. Validate a remote secured relay and practical host/join UX separately from world replication.
+4. Integrate durable metadata/checkpoints and explicit ambiguous-crash reconciliation before promising general recovery.
 
-005/006 retain their copied-install **outside Sandboxie** qualification. Later logs do not independently certify all process/Cloud boundaries. `UnstrippedToken=y` reduces token isolation; ACSEDebug GUI/native helper compatibility remains unvalidated.
+Historical 005/006 outside-Sandboxie findings remain unchanged. Later successful Host/Guest tests supersede the old "guest unvalidated" status only for the tested arrangement; they do not certify every isolation boundary.

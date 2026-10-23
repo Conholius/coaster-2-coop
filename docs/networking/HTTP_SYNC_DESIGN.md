@@ -1,14 +1,35 @@
 # Proposed HTTP scenery synchronization
 
-**Design / not implemented end to end. Updated 2026-10-22.** [Transport facts](TRANSPORT.md) · [Latest evidence](../research/DIAGNOSTICS_050_068.md) · [Recovery](RECOVERY_AND_HISTORY.md) · [Measurements](BENCHMARKS.md)
+**Full architecture remains proposed; scripted two-client and single manual host-Create paths verified. Updated 2026-10-23 through 082.** [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [Latency investigation](HTTP_LATENCY_080_082.md) · [Transport facts](TRANSPORT.md) · [Latest evidence](../research/DIAGNOSTICS_050_068.md) · [Recovery](RECOVERY_AND_HISTORY.md) · [Measurements](BENCHMARKS.md)
 
 ## Scope and evidence boundary
 
 Initial target: two players collaboratively create, move and delete supported scenery in matching parks. Exchange **accepted object changes**, not the entire park every poll. Existing thousands of unchanged objects require identity/baseline agreement, not continuous retransmission of their transforms. Full guests/staff/economy/terrain/ride simulation is outside this design; matching scenery does not imply deterministic simulation.
 
-The building blocks have passed separately: native GET/text response, sequential A/B messages, HTTP-triggered Create/Move/Delete and native Undo/Redo, guarded redelivery, grouped creation, live-client fault recovery and a controlled saved-checkpoint client reload. Two simultaneous clients, ordinary player-edit capture, remote HTTPS, automatic general durable recovery and resync have NOT passed. This page proposes their integration.
+Two simultaneous local clients now pass scripted Create/Move/Delete/native Undo/Redo, duplicate handling, controlled ACK/TCP/server restart and completed-checkpoint Guest reload (071–078). Corrected 079–081 capture one ordinary player-confirmed host rock and create it once on the guest; 080/081 keep the distinct next host preview local and active. These are narrow diagnostic paths. General manual Move/Delete, guest intent/ownership, remote HTTPS, automatic general durable recovery, lobby integration and resync remain unverified.
 
-## Roles and data path
+## Verified one-way manual Create path — 080/081
+
+```mermaid
+sequenceDiagram
+    participant A as Host A
+    participant R as Local relay
+    participant B as Guest B
+    A->>A: Player confirms one stone
+    A->>A: Observe original commit completion
+    Note over A: Next preview remains local and active
+    A->>R: Publish confirmed Create and host proof
+    B->>R: Request next command
+    R-->>B: Deliver confirmed Create
+    B->>B: Create once and verify world
+    B->>R: Applied proof
+    R-->>B: Deliver same command again
+    B->>B: Skip duplicate without native action
+```
+
+This diagram describes the tested flow, including its extra diagnostic proof gate. A's originating commit is not replayed locally. B does not publish remote effects back. That one-way configuration does not yet establish general bidirectional capture/echo suppression. Only sampled preview continuity is claimed. The target product should transfer confirmed placements while the next preview remains active; transient previews are not durable Create events.
+
+## Proposed complete roles and data path
 
 ```mermaid
 sequenceDiagram
@@ -28,7 +49,7 @@ sequenceDiagram
 
 This is a proposed host-authoritative edit model. The relay coordinates durable delivery and ordering; it cannot decide whether a PC2 preview is actually committable. Define one accepted event sequence at the host and have the relay retain it. A guest proposes intent and waits for acceptance before a durable local effect in the first prototype. A host's already committed originating edit must be recorded as locally applied when its event is echoed, preventing a second local commit.
 
-Ordinary editor input interception is unproven. Start with a scripted sender rather than describing this diagram as capture of normal building actions. If normal UI already committed an edit, it requires a distinct, tested reconciliation/acceptance path; do not automatically replay it on the origin.
+Single ordinary host Create observation is verified in corrected 079–081. General Move/Delete interception, repeated/cancelled placement and guest-originating intent acceptance are not. The complete diagram above remains proposed. If normal UI already committed an edit, record it as locally applied; do not automatically replay its echoed event on the origin.
 
 ## Proposed event envelope
 
@@ -46,7 +67,7 @@ Ordinary editor input interception is unproven. Start with a scripted sender rat
 | canonicalPayloadDigest | Detect conflicting reuse of an ID; define canonical bytes/version first |
 | transactionID, if batching | Explicitly distinguish an event group from independent commands |
 
-This schema is a proposal, not a claim that JSON, digest libraries or all transform fields have already been tested in this Lua environment. Existing diagnostics use a small text protocol and a tested rock position. A digest is not authentication.
+This schema is a proposal, not a claim that JSON, digest libraries or all transform fields have already been tested in this Lua environment. Existing diagnostics use a small text protocol, tested rock positions and limited captured/prepared orientation checks; full world rotation/scale equivalence across resources is not established. A digest is not authentication.
 
 ## Admission, execution and acknowledgement
 
@@ -58,23 +79,27 @@ This schema is a proposal, not a claim that JSON, digest libraries or all transf
 6. Only then acknowledge APPLIED_AND_VERIFIED. HTTP 200 / received / queued is NOT an application acknowledgement. On a completed duplicate return the stored outcome without another editor operation.
 7. On uncertainty after commit attempt, pause replication for that operation. Do not guess failure from a disconnected response and blindly commit again.
 
-In-memory deduplication survives the tested network/server failures while the client remains alive (059–062). A controlled completed-checkpoint reload restores the corresponding records in 063. Automatic arbitrary-crash-safe deduplication is not established. It provides **at-most-once commit attempts in the tested lifetime**, not distributed exactly-once effects under crashes.
+In-memory deduplication survives the tested network/server failures while the client remains alive (059–062). A controlled completed-checkpoint reload restores the corresponding records in 063; 078 extends this to B restarting while A/server stay alive. Automatic arbitrary-crash-safe deduplication is not established. It provides **at-most-once commit attempts in the tested lifetime**, not distributed exactly-once effects under crashes.
 
 ## Crash and reconnect boundaries
 
 There is no demonstrated atomic transaction joining a PC2 park commit, the relay journal and mod-owned persistent metadata. A crash after native commit but before recording/acknowledging it is an ambiguous outcome. A server remembering a commandID alone cannot resolve whether a restarted client already applied it.
 
-Proposed recovery requires a durable accepted-event journal, client applied watermark, object revision/tombstones, save/baseline identity and an independently verified inventory reconciliation. Persist the logical identity manifest with a defined matching park checkpoint; a manual/server manifest pairing passed in 063, while automatic in-save mod-data integration is still unproven. Reconnect resumes only after epoch/baseline/watermark agreement. On mismatch, stop edits and reconcile or load an agreed checkpoint; do not replay all CREATEs into an unknown park.
+Proposed recovery requires a durable accepted-event journal, client applied watermark, object revision/tombstones, save/baseline identity and an independently verified inventory reconciliation. Persist the logical identity manifest with a defined matching park checkpoint; a controlled manifest pairing passed in 063 and the two-client extension 078, while automatic in-save mod-data integration is still unproven. Reconnect resumes only after epoch/baseline/watermark agreement. On mismatch, stop edits and reconcile or load an agreed checkpoint; do not replay all CREATEs into an unknown park.
 
-Late join should use a known compatible baseline/checkpoint plus subsequent ordered changes, not an unbounded initial event history. Test chunked inventories and repair procedures separately. Saving is a host-controlled explicit checkpoint decision, not a side effect of receiving each event. 063 establishes one controlled local checkpoint workflow, not this distributed metadata/resync workflow.
+Late join should use a known compatible baseline/checkpoint plus subsequent ordered changes, not an unbounded initial event history. Test chunked inventories and repair procedures separately. Saving is a host-controlled explicit checkpoint decision, not a side effect of receiving each event. 063 and 078 establish controlled completed-checkpoint workflows, not this general distributed metadata/resync workflow.
 
 ## HTTP polling, batching and backpressure
 
 Begin with one request in flight per client, bounded event batches and an ordered editor queue. Poll with an applied sequence/cursor; retain undelivered events until the intended consumer acknowledges application. Use timeout/backoff and queue limits, not an infinite tight retry loop. Idle polling frequency and batch budgets must be measured on the actual remote route.
 
-HTTP can carry ordered operations reliably at the transport layer, but reconnects and retries still require application dedup/order/recovery. No request-response protocol makes a game commit atomic. Request delivery latency includes network RTT, poll waiting, native task scheduling, admission and the editor operation.
+HTTP can carry ordered operations reliably at the transport layer, but reconnects and retries still require application dedup/order/recovery. No request-response protocol makes a game commit atomic. Request delivery latency includes network RTT, poll waiting, native task scheduling, admission and the editor operation. Separate native commit completion, world verification and confirmation returned to the host: 081 measured about 16.25 ms for B's commit call/wait but 2239.214 ms until A received the application proof.
 
 Diagnostics 048/049 support batching **independent creates**: issue multiple requests with a shared completion token, wait once, edit each result, preview and commit once. Do not merge dependent CREATE/MOVE/DELETE events or unrelated user undo actions into a batch without explicit transaction semantics. One commit for many objects changes the undo boundary and failure handling. 050–054 passed 500-rock groups / 2,701 total rocks; 067/068 profiled real objects and targeted checks. These observations are not a universal frame budget. Large batches and repeated full inventories must remain bounded by measured work and transaction semantics.
+
+Completed 082 exposes a native-request-path delay: B later takes about 940 ms inside RunKeplerRequest even alone, with larger backlog and separate ports, while server processing/write and Guest Python controls are fast. A possible pacing/limiting mechanism is a hypothesis, not an established quota. Do not just raise polling frequency or blame HTTP globally. Test request spacing/history/recovery and pre-connect versus post-response timing. [Full method and phase table](HTTP_LATENCY_080_082.md).
+
+The 080/081 relay withheld B delivery until A submitted a second diagnostic proof after publication. Removing this extra delivery gate and moving additional audits off the critical path are candidates to test while preserving native completion, valid world data and immutable command status. Long polling, persistent connections and a sidecar also remain untested alternatives.
 
 Use measurements to choose batch size/frame budget. A localhost 1 MiB response test is not a target packet size and does not establish upload throughput, multi-peer capacity or safe edit rates.
 
@@ -86,7 +111,7 @@ Each client connects outward to an owner-controlled HTTPS relay; friends need no
 
 The relay could be a separate service, or a local sidecar that maintains the remote link while the game uses loopback HTTP. A sidecar is an architectural option, not a tested shipped bridge. It would preserve our validated local HTTP boundary while moving remote security/recovery into original external code.
 
-## Staged acceptance tests
+## Staged acceptance tests and current position
 
 1. Two simultaneous clients: harmless numbered messages both ways, matched session and full task completion.
 2. Owner-controlled remote HTTPS route: same test, with explicit latency and timeout evidence.
@@ -96,7 +121,7 @@ The relay could be a separate service, or a local sidecar that maintains the rem
 6. Confirmed ordinary UI edit capture; then persistent mappings, checkpoint/reload, crash/reconnect and late join.
 7. Load/soak tests with realistic parks and frame-time measurement, followed by supported resource/undo/transform expansion.
 
-No playable co-op or complete park synchronization is claimed until these gates are met.
+Current position: local parts of gates 1, 3–5 and one host-Create part of gate 6 passed in controlled diagnostics. The remote route, general guest/manual edits, ownership, automatic durable recovery and resync remain open. 082 adds a concrete request-latency investigation before choosing a production polling budget. No playable release or complete park synchronization is claimed.
 
 ## Registry and Undo decisions informed by 064–068
 

@@ -1,8 +1,16 @@
 # Transport and editor measurements
 
-**Updated 2026-10-22.** [Transport](TRANSPORT.md) · [Earlier ledger](../research/DIAGNOSTICS_035_049.md) · [050–068 ledger](../research/DIAGNOSTICS_050_068.md)
+**Updated 2026-10-23 through 082.** [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [080–082 latency details](HTTP_LATENCY_080_082.md) [Transport](TRANSPORT.md) · [Earlier ledger](../research/DIAGNOSTICS_035_049.md) · [050–068 ledger](../research/DIAGNOSTICS_050_068.md)
 
 All numbers below are owner-run local tests on the reported PC2 setup, not public automated two-client QA. Read timing boundaries before comparing columns. Raw logs and personal machine details stay private.
+
+## Latest result: two clients and native-request delay
+
+082 completed all fourteen phases and 1,200 verified probes (200 warmup / 1,000 measured). A/B/P counts 480/600/120; game tasks 552/552 and 646/646 joined; all participants/server Completed=true. Initial single-client medians are 15.85 ms (A) and 23.81 ms (B), but later B medians remain about 944–947 ms with either backlog and separate listeners. Python in Guest sandbox has total medians 0.94–0.99 ms; max 24.04 ms.
+
+The delay is inside RunKeplerRequest; native worker dispatch is about 0.17–0.20 ms and return-to-Join about 5 ms. Server accepted-connection-to-reply-ready is generally below a few milliseconds and write/flush max below 0.42 ms for game probes. Larger backlog is not a demonstrated fix; request history/order matters. Exact pre-connect versus post-response native attribution and a possible request-pacing limit remain unknown. [Full phase table and limitations](HTTP_LATENCY_080_082.md).
+
+080's 591.284 ms and 081's 2,239.214 ms are host-observed application-proof latency, not guest commit or pure network time. In 081 the guest commit invocation/wait took about 16.25 ms and receipt-to-completed-commit 136.577 ms. Different runs are not a controlled proof that deferred logging helps or hurts.
 
 ## HTTP downloads: diagnostics 046 and 047
 
@@ -130,7 +138,7 @@ Same game workload/counts as 067, no added yield points. A first name-shadowing 
 | Slowest WORK callback, registry + next Create group | 3.4665 | 16.0869 | 12.6204 |
 | Largest WORK gap, 250-part edit/preview preparation | 2.9393 | 21.6808 | 18.7415 |
 
-The startup catalogue section accounts for **37.2313 ms**. Its completion-status poll accounts for only 0.0032 ms in that callback. The broader label still includes `GetAllResults` and the Lua resource search, so their individual contributions remain unknown. This is a concrete one-time startup candidate, not proof of an expensive steady-state placement query or retrospective proof of 067's spike cause.
+The startup catalogue section accounts for **37.2313 ms**. Its completion-status poll accounts for only 0.0032 ms in that callback. At the 068 stage the broader label still included `GetAllResults` and the Lua resource search; 069 later separated them as recorded below. This is a concrete one-time startup candidate, not proof of an expensive steady-state placement query or retrospective proof of 067's spike cause.
 
 The slowest WORK callback combined prior-group register creation (1.3812 ms), 250 new native create requests (1.2063 ms total), plan construction (0.5566 ms) and other work. Final register checking occupied 2.8852 ms in another callback. Native immediate `CommitPreview` / `Checkpoint` traced-call maxima were 0.0881 / 0.0139 ms, excluding later asynchronous engine work.
 
@@ -141,3 +149,9 @@ Profiling has overhead: 256 direct/traced no-op calls measured 0.0048 / 0.2742 m
 ## Derived direction, not a shipped performance guarantee
 
 Prefer a minimal registry, native lookups for changed objects, bounded mutation groups and occasional distributed full audits. Initial builds, serialization, allocation and catalogue materialization/search deserve separate budgets. Do not continuously scan/retransmit the park, extrapolate synthetic capacity to real objects, remove completion/verification waits, or merge dependent transactions merely to lower Advance counts. None of these local measurements establishes internet throughput, full simulation synchronization or a universal frame-time budget.
+
+## Catalogue refinement — 069/070
+
+069 separated 7,263-row result materialization (32.5976 ms) from the first Lua scan (4.2579 ms). Twenty scans of the retained table averaged 3.9730 ms. First-read cache state was not guaranteed cold.
+
+070 passed 110 targeted known/unknown queries across five statements with no full-catalogue fetch or Lua search. Targeted fetch max in summaries 0.0176 ms; own callback max 0.1188 ms; paired gap max 18.5428 ms, none above 33 ms. Total query elapsed generally 11–12 ms includes an asynchronous Advance wait, not continuous query CPU work. This avoids the earlier full-result spike for a known-resource lookup; it does not prove every catalogue/resource query is equally cheap. [069–082 ledger](../research/DIAGNOSTICS_069_082.md).

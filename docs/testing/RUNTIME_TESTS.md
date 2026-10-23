@@ -2,7 +2,26 @@
 
 [← Documentation guide](../README.md) · [Current status](../research/STATUS.md) · [Scenery research](../placement/README.md)
 
-**Updated 2026-10-22, reviewed through 068.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
+**Updated 2026-10-23, reviewed through 082.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
+
+## Latest completed gates — 069–082
+
+The earlier tables retain their historical scope. [069–082 ledger](../research/DIAGNOSTICS_069_082.md) contains the later per-test outcomes and corrected/aborted-run distinctions.
+
+| Diagnostic | Runtime result | Important limit |
+| --- | --- | --- |
+| Later 038 repeat | Two local clients send/receive three numbered messages each and complete | Same-machine loopback, not internet |
+| 069/070 | Split full-result materialization/search; 110 targeted known/unknown queries pass | One known scenery resource, no world edits |
+| 071–073 | Scripted Create, Move to (15,5,10), Delete and duplicates pass on both clients | Not manual player Move/Delete capture |
+| Corrected 074 | Nine unique actions, 18 deliveries, three commits plus three Undo/Redo each per client | Native live-session stacks |
+| 075/076 | Nine refused first ACKs / TCP aborts per client, replay without duplicate effects | ACK not stored before injected failure |
+| 077 | Controlled resumed server restart, same live clients, nine unique effects each | Not arbitrary client crash |
+| 078 | B saves once/restarts while A lives; restored records/mappings and new Move only | Explicit completed save/checkpoint pairing |
+| Corrected 079 | Actual player-confirmed host Create captured and applied once on B | Corrected test waits for placement-tool exit |
+| 080/081 | Same manual Create with distinct active next preview kept local | Sampled preview state, not every rendered frame |
+| Completed 082 | 14 phases, all 1,200 probes correct; A/B/P/server complete, all native tasks joined | Exact Kepler delay cause still unresolved |
+
+082's final task counts are A 552/552 and B 646/646. Guest Python runs in Sandboxie and performs direct TCP/HTTP measurements. No database/editor/save changes are made. Earlier aborted 082 reports on world deactivation are not completed runs; all participants must remain alive through phase 14 and final acknowledgements. [Measured results](../networking/HTTP_LATENCY_080_082.md).
 
 ## Environment and isolation boundary
 
@@ -101,7 +120,7 @@ This documentation update does not run the game. Older overwritten logs are summ
 
 ## Next experiment and unproven scope
 
-Prove harmless messaging between two simultaneous actual clients and the remote relay route, then a scripted scenery event. Local recovery/benchmark outcomes through 068 are detailed in the [new ledger](../research/DIAGNOSTICS_050_068.md). [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
+Simultaneous local messaging, scripted events and one ordinary host Create have now passed in 071–081. Next isolate the native request delay from 082, extend manual Move/Delete, and test the remote relay route. Earlier local recovery/benchmark outcomes through 068 are in the [050–068 ledger](../research/DIAGNOSTICS_050_068.md); later evidence is in [069–082](../research/DIAGNOSTICS_069_082.md). [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
 
 No simultaneous/internet gameplay, ordinary player-edit capture, automatic general durable deduplication, distributed reconnect/resync or full simulation synchronization is established. 062 tests server restart with a surviving client ledger; 063 tests client reload from a completed saved checkpoint, not arbitrary crash recovery. Full Steam/Cloud isolation and second guest configuration remain unvalidated.
 

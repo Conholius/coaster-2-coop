@@ -1,33 +1,30 @@
-# First prototype: HTTP-delivered scenery replication
+# Scenery co-op prototype: completed gates and next work
 
-> **Updated 2026-10-22 through diagnostic 068.** Local native HTTP scenery commands, live-session native Undo/Redo, guarded redelivery, controlled server/checkpoint-client recovery and real-object register/query measurements passed. **Simultaneous two-client replication, normal edit capture and automatic general distributed persistence have not passed.**
+**Updated 2026-10-23 through diagnostic 082.** [Status](../research/STATUS.md) · [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [Protocol](../networking/HTTP_SYNC_DESIGN.md) · [Latency](../networking/HTTP_LATENCY_080_082.md)
 
-[Current facts](../research/STATUS.md) · [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md) · [Native contract](../networking/TRANSPORT.md)
+## Initial goal achieved within diagnostic scope
 
-## First acceptance goal
+Two local PC2 clients can apply scripted AQ_Rock_04 Create/Move/Delete/native Undo/Redo events through a loopback relay, suppress duplicate effects and pass controlled reconnect/restart tests. One player-confirmed host placement replicates to the guest while the host's next unconfirmed preview remains active and local.
 
-With two independently authorized real PC2 clients on matching builds and park baselines, reproduce one scripted host-accepted AQ_Rock_04 event on the guest. Compare logical identity/resource/world transform and intended commit counts; local Part-IDs may differ. First run without saves. This is a plan, not a completed test.
+This is an owner-run diagnostic prototype, not a finished multiplayer mod or automated QA suite. Local Part-IDs and Entity-IDs are not universal identities. No internet deployment or general manual Move/Delete capture has passed.
 
-## Steps
+## Next implementation gates
 
-1. Record exact game/mod versions and hashes privately; confirm copied-install/profile/Cloud boundaries and matching park baseline/identity manifest.
-2. Exchange harmless numbered messages concurrently over a local route, then the intended owner-controlled remote route; retain full acknowledgements and task lifecycle evidence.
-3. Establish session/epoch/version validation, authoritative ordering, immutable command-ID records, per-client logical-ID mapping and origin echo suppression.
-4. Apply one host-accepted scripted CREATE to the guest; wait for native completion and verify resource/position/mapping across two Advances before application ack.
-5. Test redelivery, response loss, order gaps, changed-content ID conflicts and stale revisions without extra effects. Stop unresolved commit outcomes rather than retrying blindly.
-6. Extend to MOVE/DELETE and independently addressed identical resources; validate error/cancel/undo ownership.
-7. Add ordinary confirmed user-edit capture as its own tested feature.
-8. Extend the local 062/063 journal/completed-checkpoint results to automatic registry storage, ambiguous crash windows, cross-client checkpoint agreement, resync and late join. Local controlled save/reload is insufficient for general recovery.
-9. Use measured batch/frame budgets and stress/soak tests; keep full simulation outside the first scope.
+1. Resolve or bound the native-request delay observed in 081/082 using controlled pacing/history and network timing. Do not assume a fixed quota or remove safety checks to improve a number.
+2. Capture manual host Move/Delete and repeated Create safely after actual confirmation; distinguish preview updates/cancellation from durable edits.
+3. Build generalized logical identity/revision/status management and origin/remote echo suppression, then guest intent acceptance and conflict ownership.
+4. Preserve native completion/verification and bounded work; benchmark request count, application latency and Advance gaps separately.
+5. Validate a secured remote relay with a friend, including packaging, auth, native HTTPS/body/header behavior, failures and bounded reconnect.
+6. Integrate registry metadata/checkpoints and test ambiguous client-crash windows, mismatched saves, replay and late join.
+7. Prototype host/join UI after identifying actual PC2 runtime extension points. The product direction is a shared host-controlled session and save workflow; independently loaded local test parks are a testing scaffold.
+8. Expand resources, full transform validation, groups/dependencies and Undo ownership, then soak and presented-frame tests.
 
-## Evidence required
+## Reproducibility and acceptance
 
-Exact build, operation/session sequence, canonical states, command and commit counts, task completions, failures and explicit expected/observed outcomes. Keep raw logs, park files and personal paths private. Distinguish owner-run scripted diagnostics from an automated two-client suite. Protocol recovery rules in the design page are proposals until implemented and exercised.
+Keep matched protocol sessions, canonical payloads, local mappings, actual native mutation counts, application proofs, task joins and explicit expected/observed results. Retain raw evidence privately and publish summarized findings. Corrected successful runs must be distinguished from initial/aborted attempts. A final summary on failure is not Completed=true.
 
-## Exclusions
+For 082 reproduce: both game clients in tropical parks, separate control listener, ten warmups plus 50 measured probes per active role/configuration, seven configurations then reversed order, fixed bodies and request IDs, 50 ms requested spacing, Python control in Guest sandbox. Leave all participants alive until all fourteen phase barriers and final completions finish.
 
-No guest/staff/economy simulation, terrain/paths/tracks/rides, public service mutation, anti-cheat bypass or claim of playable co-op. Do not publish game dumps or tokens.
+## Boundaries
 
-## Implementation decisions supported by later tests
-
-Use minimal logical identity/revision records and targeted native verification. Keep grouped transaction boundaries and completion waits. Native history may be empty after reload; cross-session Move counteractions are an optional feature needing its own persisted data/ownership rules. Profile catalogue startup separately from steady-state edits. See [recovery/history](../networking/RECOVERY_AND_HISTORY.md), [benchmarks](../networking/BENCHMARKS.md) and [050–068](../research/DIAGNOSTICS_050_068.md).
+A guest-local checkpoint save was specifically permitted in 078, not an established general guest-save policy. Native Undo stacks do not survive the tested reload; replay safety and optional cross-session Undo are separate concerns. A menu/lobby does not implement world transfer. No full guest/staff/economy/terrain/path/track/ride simulation, production security or released playable co-op is claimed.

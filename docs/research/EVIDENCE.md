@@ -1,6 +1,6 @@
 # Evidence index
 
-These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 068 are indexed in the later sections and in [STATUS.md](STATUS.md).
+These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 082 are indexed in the later sections and in [STATUS.md](STATUS.md).
 
 | Area | Local source material | Confirmed symbols/observations | Qualification |
 | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ All successful 005/006 sessions in the following table used a **copied game inst
 
 The detailed experiment matrix is [runtime tests](../testing/RUNTIME_TESTS.md). Original logs are **private and not stored in GitHub**; source paths, user names, dumps, save files and binary packages remain in local evidence storage. Build **1.11.4.1011357** is game/log-reported; executable and OVL SHA-256 values are not recorded in these public notes.
 
-## Separate local Sandboxie setup (not the above runtime runs)
+## Historical initial Sandboxie setup (not the above 005/006 runs)
 
 The project setup notes describe `PC2CoopHost` and an unvalidated `PC2CoopGuest`, file-redirection rules, and a startup configuration with `UnstrippedToken=y` allowing a main-menu launch in the host. This is a **reported setup / past startup observation**, not proof that 005/006 were executed in Sandboxie, that the guest launches, that Steam Cloud is fully isolated, or that Denuvo caused the original failure. See [translated setup notes](../ISOLATED-INSTALLATION.md).
 
@@ -112,3 +112,25 @@ The retained private version-marked logs were reread for this update. [Per-test 
 | ForgeUtils moddb.lua at 90b78c31693a473e73d621af145053c3b5fc8059 | Mod/version registration, not instance/action storage | No native replacement for all synchronization semantics found in inspected material |
 
 Source-function links are in [ACSE/ForgeUtils](../placement/ACSE_FORGEUTILS.md) and [recovery/history](../networking/RECOVERY_AND_HISTORY.md). The supplied API inventory is labelled 1.0.6.429191 and prefab dumps include 1.10.2.906765; current runtime logs identify 1.11.4.1011357. Presence in an older inventory is not sufficient behavior evidence for the current build.
+
+## Two-client and latency evidence — 069–082, reviewed 2026-10-23
+
+[Detailed ledger](DIAGNOSTICS_069_082.md) · [Timing definitions and full 082 phase table](../networking/HTTP_LATENCY_080_082.md). Retained logs were read; no game or diagnostic was run for this publication.
+
+| Evidence anchor | Verified or observed finding | Boundary |
+| --- | --- | --- |
+| 069 FIRST/REPEAT paired samples and RESULT | 7,263 rows, 32.5976 ms retrieval, 4.2579 ms first scan; twenty retained-table scans average 3.9730 ms | Not guaranteed cold; elapsed not CPU; Advance gaps not presented frames |
+| 070 per-statement summaries, CALLBACK_TOTAL and RESULT | 110 known/unknown targeted queries; no full catalogue; own max 0.1188 ms, gap max 18.5428 ms | Exact known resource and statement semantics only |
+| Later 038 Host/Guest RESULT and completion | sent=received=3 each, matched fresh session, 47/4 tasks | Earlier 038 sequential scope retained; no internet test |
+| 071–074 paired client RESULT/world records | Both-client scripted scenery and native history with duplicate suppression | One resource/controlled order, not free simultaneous editing |
+| 075/076 paired RESULT plus original fault-injection server logic/prior reviews | Nine refused/dropped first ACKs and nine duplicates per client, no additional native effects | Before ACK storage; 076 server cleanup fix separate |
+| 077 paired RESULT and journal/generation server code | Resumed generation 2, one duplicate and nine unique actions each, A/B 98/70 tasks joined | Controlled process restart only |
+| 078 A/B Phase 1/B Phase 2 RESULT and checkpoint/restore records | A stays alive; one B local save, two restored records, fresh entity lookup, only new Move committed | Successful complete checkpoint, not arbitrary unsaved crash |
+| Corrected 079 hook/capture/world/RESULT records | Hook actually invoked, one original manual commit/capture/publication, Guest one effect plus duplicate skip | Registration alone not invocation; guest capture disabled |
+| 080 matched A/B results and server proofs | Distinct committed/preview parts, 45/45 active observations, one Guest Create/commit and duplicate skip, tasks 53/69 | Next preview local, no per-presented-frame proof |
+| 081 events/measurements and server summary | B commit call/wait 0.017/16.231 ms; 136.577 ms receipt-to-commit; A proof latency 2239.214 ms | Independent clocks; no logging-only controlled comparison |
+| Completed 082 A/B, server and Guest Python records | 14 phases; 480/600/120 probes; all 1200 valid; A/B tasks 552/646 joined; no unmatched/open probe connections | Loopback, Python 3.11.0, local clocks only, original HTTP/1.0 connection-close path |
+| 082 request/server/control timing records | Long waits inside native Run; fast accepted-handler/write and Python controls; larger queue/ports insufficient | TCP pre-accept vs post-response native return not separated; fixed quota hypothetical |
+| Supplied UI/interface catalogue and editor reconstructed sources | Existing view/dialog mechanisms and editor confirmation/commit boundaries inspected | No new main-menu Co-op entry, lobby, generic intercept framework or source runtime equivalence established |
+
+Private diagnostic identifiers and full log files are intentionally not published. Names of original mod diagnostic functions identify the measured code path without redistributing proprietary game source.

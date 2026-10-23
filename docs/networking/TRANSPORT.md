@@ -1,14 +1,22 @@
 # Native HTTP transport in Planet Coaster 2
 
-**Updated 2026-10-22; transport/recovery findings through 063, benchmark review through 068.**
+**Updated 2026-10-23; reviewed through 082.** [Two-client ledger](../research/DIAGNOSTICS_069_082.md) · [Native/Python latency comparison](HTTP_LATENCY_080_082.md)
 
 [Current status](../research/STATUS.md) · [035–049 evidence ledger](../research/DIAGNOSTICS_035_049.md) · [Proposed synchronization](HTTP_SYNC_DESIGN.md) · [Measurements](BENCHMARKS.md)
 
 ## Verified in a running game
 
-The transport blocker recorded at diagnostic 034 has been resolved for the tested **native HTTP GET to an owner-controlled loopback server**. Diagnostics 037b–047 demonstrate text request/response transport. 038 demonstrates a server retaining messages between **sequential A, B and A-again game runs**, not simultaneous clients. 040–042 connect downloaded commands to real scenery creation/movement with session-local duplicate suppression.
+The transport blocker recorded at diagnostic 034 has been resolved for the tested **native HTTP GET to an owner-controlled loopback server**. Diagnostics 037b–047 demonstrate text request/response transport. The original 038 demonstrated sequential A/B/A-again runs; a later fresh-session tropical-park repeat passed on two simultaneous local clients. 040–042 connect downloaded commands to real scenery creation/movement with session-local duplicate suppression.
 
 Test environment: Windows / Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 2.7.0, ACSEDebug 0.014. Binary hashes are not established in this public record. Claims apply to this tested setup, not every PC2 release.
+
+## Current two-client result and latency boundary
+
+071–078 passed scripted scenery operations, duplicate/native-history checks and controlled ACK/TCP/server/checkpoint-client recovery on two running local clients. Corrected 079–081 captured one ordinary host-confirmed Create and replicated it once to the guest while keeping the next preview local (080/081). General manual Move/Delete and remote play remain open.
+
+Completed 082: all 14 phases, 1,200 correct probes, native task joins complete, both clients/Python/server Completed=true. B starts fast but later native calls take roughly 940 ms even alone, with backlog 128 and on a separate port. Server accept-to-reply and write sections stay fast. Same-sandbox Python has total medians 0.94–0.99 ms and max 24.04 ms. These observations narrow the suspect path but do not prove a fixed rate limit, exact Kepler cause or TCP failure. [Full evidence and method](HTTP_LATENCY_080_082.md).
+
+No active Frontier connection is required for the tested local ready context. That does not imply the native request scheduler is unlimited, a future service shutdown is irrelevant, or remote HTTPS/security already works.
 
 ## Runtime-confirmed native request contract
 
@@ -94,7 +102,7 @@ No complete decompiled scripts, bytecode or game resources are distributed in th
 
 ## Next acceptance gate
 
-Use two independently authorized real clients at the same time, with matching park baselines, first for harmless messages and then a scripted scenery command. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
+Simultaneous local messaging/scripted scenery and one manual host Create have now passed. Next isolate request-history/pacing and network timing, then extend manual Move/Delete capture and validate a remote secured route. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
 
 ## Local recovery update — diagnostics 055–063
 
@@ -103,3 +111,7 @@ HTTP DELETE and live-session native Undo/Redo passed with duplicate/order/ID-con
 The tested reset response was `nativeSuccess=false`, Kepler result 3, reported status field 2, nil body. The value 2 is not an HTTP status. Treat the complete tested tuple as failure evidence; do not reinterpret every non-200 response as a TCP reset or discard still-running tasks on timeout.
 
 062 resumed a journal-backed server after an actual process exit while the client stayed alive. 063 resumed a restarted client from a completed save/manifest checkpoint. These extend local recovery evidence but do not prove arbitrary crash safety or simultaneous-client convergence. [Exact outcomes and limits](RECOVERY_AND_HISTORY.md).
+
+## Connection and pacing alternatives: untested
+
+Long polling could remove the explicit idle-poll pause; persistent HTTP could reduce connection setup; a sidecar could decouple remote networking from the game. None has resolved the 082 behavior in a runtime test. Retain one owned request/task until completion, use bounded queues and do not assume a local timer cancels native work. A suspected request limit must be measured and respected, not treated as a confirmed implementation detail or bypass target.

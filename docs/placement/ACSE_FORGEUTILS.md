@@ -1,6 +1,6 @@
 # Persistent scenery placement: ACSE / ForgeUtils investigation
 
-Original investigation: 2026-10-20, **static source research**. Current update: 2026-10-22 through diagnostic 068. Historical blockers below were superseded by runtime scenery tests; custom-registry serializer integration remains untested. See [current status](../research/STATUS.md).
+Original investigation: 2026-10-20, **static source research**. Current update: 2026-10-23 through diagnostic 082. Historical blockers below were superseded by runtime scenery tests; custom-registry serializer integration remains untested. See [current status](../research/STATUS.md).
 
 ## Result
 
@@ -66,7 +66,7 @@ Use an existing base-game freeform decoration, avoiding custom catalogue assets 
 - Move the prop, save/reload again; delete it, save/reload again. Check undo/redo separately.
 - Treat changed runtime EntityIDs as expected possibilities; compare durable identity/resource/transform rather than equating runtime IDs across sessions.
 
-## Current blockers and next inputs
+## Historical source gaps from the original collection
 
 The supplied local evidence collection has now been inspected: 318 files and five archive inventories. It contains editor-mode registration, browser catalogue queries, world-save orchestration and component schemas. `gameditor/gameeditormodes_unluac.lua:34–35` identifies `Editors.Scenery.SceneryEditMode`, but the corresponding implementation is absent from the collection and archive entry inventories. No scenery creation or undo preview/commit call sites were found in the supplied Lua/text files. The next input is the actual editor module from the installed game or a narrow inspection of the loaded module, plus an isolated runtime test environment. Original evidence remains local. No game installation, save, or mod package was modified.
 
@@ -89,3 +89,11 @@ The public ACSE `PlanetCoaster2` branch resolved to the same pinned commit as th
 The [ForgeUtils ModDB source](https://github.com/Distantz/ForgeUtils/blob/90b78c31693a473e73d621af145053c3b5fc8059/Main/forgeutils/moddb.lua) handles mod/version registration, not placed-instance/action storage. Native selection part sets do not establish a durable network ledger. No inspected alternative supplies all cross-client logical IDs, revisions, command outcomes and tombstone semantics.
 
 Derived direction: small own Lua registry plus native placement queries, with ACSE callbacks as a candidate automatic persistence layer. 066 compared synthetic records; 067/068 tested real-object lookup/update costs. [Recovery and history](../networking/RECOVERY_AND_HISTORY.md) · [Benchmarks](../networking/BENCHMARKS.md).
+
+## Later source and runtime resolution — 069–082
+
+Later owner-provided editor/browser/UI archives extend the original collection. The earlier missing-editor-module statement describes the 2026-10-20 static snapshot, not the current evidence set. Inspected placement code separates confirmation notification, preview and actual CommitPreview; a pre-commit scenery-placed message is not sufficient proof of a durable accepted object.
+
+Corrected 079 runtime records actually invoke a ForgeUtils hook on Editors.Scenery.SubModePlacement.CommitPreview, observe the original editor commit and publish one captured object to the guest. 080/081 keep the distinct next preview active and local. The hook preserves the original invocation/yields/return values and queues data rather than doing network/editor work inside the interception. Guest capture is disabled in these one-way diagnostics; general bidirectional hooking is not established.
+
+069 separates full-result materialization from Lua search; 070 passes targeted known/unknown lookups. Custom in-save registry persistence, a production lobby/menu and general manual Move/Delete remain open. [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [Timing and HTTP boundaries](../networking/HTTP_LATENCY_080_082.md).
