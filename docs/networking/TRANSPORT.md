@@ -1,10 +1,20 @@
-# Native HTTP transport in Planet Coaster 2
+# Transport: own native bridge and historical Kepler HTTP
 
-**Updated 2026-10-23; reviewed through 082.** [Two-client ledger](../research/DIAGNOSTICS_069_082.md) · [Native/Python latency comparison](HTTP_LATENCY_080_082.md)
+**Updated 2026-10-24; native bridge through 084 Step 11, Step 12 pending.** [Two-client ledger](../research/DIAGNOSTICS_069_082.md) · [Native/Python latency comparison](HTTP_LATENCY_080_082.md)
 
 [Current status](../research/STATUS.md) · [035–049 evidence ledger](../research/DIAGNOSTICS_035_049.md) · [Proposed synchronization](HTTP_SYNC_DESIGN.md) · [Measurements](BENCHMARKS.md)
 
-## Verified in a running game
+## Current transport choice
+
+**Derived decision:** Kepler's observed request-history-dependent one-second waits are unsatisfactory for responsive editing. It is no longer the preferred experimental transport. 083's spacing/quiet-pause controls support an internal pacing hypothesis but do not identify a fixed quota or prove that HTTP itself is unsuitable.
+
+[Own DLL/Named-Pipe bridge and logger](NATIVE_BRIDGE.md) now passed direct strings under GC pressure, logging without ACSEDebug, sandbox-to-external-Python communication and 1,000 acknowledged messages each way between two local clients. ACSE remains the loader. This is promising local transport and original diagnostic code, not a complete interactive debugger or released remote netcode.
+
+Step 12 will port one ordinary manual Create plus duplicate checks to this path; no result is reviewed yet. Earlier HTTP scenery/recovery findings remain valid in their original scope and are not automatically transferred. Companion remote transport, authentication, pipe reconnect, durable recovery and the reported exit crash remain open.
+
+The remaining sections preserve the tested historical HTTP contract.
+
+## Verified historical HTTP behavior
 
 The transport blocker recorded at diagnostic 034 has been resolved for the tested **native HTTP GET to an owner-controlled loopback server**. Diagnostics 037b–047 demonstrate text request/response transport. The original 038 demonstrated sequential A/B/A-again runs; a later fresh-session tropical-park repeat passed on two simultaneous local clients. 040–042 connect downloaded commands to real scenery creation/movement with session-local duplicate suppression.
 
@@ -62,7 +72,7 @@ Observe FrontierAccountManager `IsConnected` / `IsConnecting` for evidence, but 
 
 035b established a custom Lua-to-JavaScript-to-Lua message roundtrip and view/resource cleanup. 036/036b JavaScript HTTP attempts reported 404 while the owner-controlled server saw no corresponding request. A separate Python control from the same PC2CoopHost sandbox reached exactly that server with HTTP 200 and the expected marker/body.
 
-Prior private inspection of PC2's native Gameface resource handling reported resource-oriented dispatch rather than demonstrated forwarding of these external requests. The controls are consistent with a rejection/404 in the embedded resource path, not a missing Python route or a general Sandboxie loopback block. Do not extrapolate this to every Gameface configuration or claim the control proves all per-process network permissions. The supported path for our tested transport is native Kepler HTTP; JavaScript is not required.
+Prior private inspection of PC2's native Gameface resource handling reported resource-oriented dispatch rather than demonstrated forwarding of these external requests. The controls are consistent with a rejection/404 in the embedded resource path, not a missing Python route or a general Sandboxie loopback block. Do not extrapolate this to every Gameface configuration or claim the control proves all per-process network permissions. At that stage, the demonstrated HTTP path was native Kepler rather than JavaScript. The newer preferred local boundary is the own DLL/pipe channel described above.
 
 ## Capability history (031–034)
 
@@ -102,7 +112,7 @@ No complete decompiled scripts, bytecode or game resources are distributed in th
 
 ## Next acceptance gate
 
-Simultaneous local messaging/scripted scenery and one manual host Create have now passed. Next isolate request-history/pacing and network timing, then extend manual Move/Delete capture and validate a remote secured route. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
+Simultaneous local messaging/scripted scenery and one manual host Create have now passed. 083 has tested spacing/history and quiet recovery; 084 has passed the own local transport through Step 11. Next validate Step 12 native-pipe Create, recovery/lifecycle, manual Move/Delete and a secured remote companion route. An internet relay package was prepared but no remote friend test has passed yet. Read the [proposed protocol and failure rules](HTTP_SYNC_DESIGN.md); these rules are design work, not an already implemented co-op system.
 
 ## Local recovery update — diagnostics 055–063
 
@@ -112,6 +122,6 @@ The tested reset response was `nativeSuccess=false`, Kepler result 3, reported s
 
 062 resumed a journal-backed server after an actual process exit while the client stayed alive. 063 resumed a restarted client from a completed save/manifest checkpoint. These extend local recovery evidence but do not prove arbitrary crash safety or simultaneous-client convergence. [Exact outcomes and limits](RECOVERY_AND_HISTORY.md).
 
-## Connection and pacing alternatives: untested
+## Historical HTTP alternatives (not validated fixes for Kepler)
 
 Long polling could remove the explicit idle-poll pause; persistent HTTP could reduce connection setup; a sidecar could decouple remote networking from the game. None has resolved the 082 behavior in a runtime test. Retain one owned request/task until completion, use bounded queues and do not assume a local timer cancels native work. A suspected request limit must be measured and respected, not treated as a confirmed implementation detail or bypass target.

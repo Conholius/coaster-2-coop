@@ -1,6 +1,8 @@
 # Proposed HTTP scenery synchronization
 
-**Full architecture remains proposed; scripted two-client and single manual host-Create paths verified. Updated 2026-10-23 through 082.** [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [Latency investigation](HTTP_LATENCY_080_082.md) · [Transport facts](TRANSPORT.md) · [Latest evidence](../research/DIAGNOSTICS_050_068.md) · [Recovery](RECOVERY_AND_HISTORY.md) · [Measurements](BENCHMARKS.md)
+> **2026-10-24 transport update:** this page retains the historical HTTP design and its tested identity/application-proof semantics. Kepler is no longer the preferred experimental path. The [own DLL/Named-Pipe bridge and external companion](NATIVE_BRIDGE.md) passed local two-client messaging and independent diagnostic logging through 084 Step 11. Step 12 manual Create over that channel is prepared, not yet verified. A general remote link remains proposed.
+
+**Historical HTTP architecture; application guards retained. Reviewed 2026-10-24 alongside native-bridge evidence through 084 Step 11. Full production architecture remains proposed.** [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [Latency investigation](HTTP_LATENCY_080_082.md) · [Transport facts](TRANSPORT.md) · [Latest evidence](../research/DIAGNOSTICS_050_068.md) · [Recovery](RECOVERY_AND_HISTORY.md) · [Measurements](BENCHMARKS.md)
 
 ## Scope and evidence boundary
 
@@ -99,7 +101,7 @@ Diagnostics 048/049 support batching **independent creates**: issue multiple req
 
 Completed 082 exposes a native-request-path delay: B later takes about 940 ms inside RunKeplerRequest even alone, with larger backlog and separate ports, while server processing/write and Guest Python controls are fast. A possible pacing/limiting mechanism is a hypothesis, not an established quota. Do not just raise polling frequency or blame HTTP globally. Test request spacing/history/recovery and pre-connect versus post-response timing. [Full method and phase table](HTTP_LATENCY_080_082.md).
 
-The 080/081 relay withheld B delivery until A submitted a second diagnostic proof after publication. Removing this extra delivery gate and moving additional audits off the critical path are candidates to test while preserving native completion, valid world data and immutable command status. Long polling, persistent connections and a sidecar also remain untested alternatives.
+The 080/081 relay withheld B delivery until A submitted a second diagnostic proof after publication. Removing this extra delivery gate and moving additional audits off the critical path are candidates to test while preserving native completion, valid world data and immutable command status. Long polling and persistent HTTP remain unvalidated fixes for Kepler. The own DLL/pipe companion path now passes local messaging in 084, while its remote connection remains untested.
 
 Use measurements to choose batch size/frame budget. A localhost 1 MiB response test is not a target packet size and does not establish upload throughput, multi-peer capacity or safe edit rates.
 
@@ -109,7 +111,7 @@ Each client connects outward to an owner-controlled HTTPS relay; friends need no
 
 038 used an in-memory diagnostic relay; later 062/063 servers added limited checkpoint journals for their specific recovery tests. None is a production service with complete security/durability guarantees. Do not expose that server unchanged. A public relay needs its own session authentication, authorization, bounded requests, replay/epoch checks, request-rate limits, retention and TLS. `SetGenerateAuthCode(false)` avoids requesting Frontier-generated auth for our endpoint; it does not authenticate our own relay. Production submission should use a defined mutation method/body and avoid sensitive query-string logging. POST/headers/upload support still need an explicit native-API test; successful GET diagnostics do not prove those capabilities.
 
-The relay could be a separate service, or a local sidecar that maintains the remote link while the game uses loopback HTTP. A sidecar is an architectural option, not a tested shipped bridge. It would preserve our validated local HTTP boundary while moving remote security/recovery into original external code.
+The relay could be a separate service, or a local sidecar that maintains the remote link while the game uses loopback HTTP. An external companion is now a tested local message-routing component in 084 Steps 10/11, but its remote link and a shipped bridge remain unverified. The preferred local game boundary is now the own DLL/pipe interface; future remote security/recovery can live in original external code. Earlier local HTTP results remain historical evidence, not the selected boundary.
 
 ## Staged acceptance tests and current position
 
@@ -121,7 +123,7 @@ The relay could be a separate service, or a local sidecar that maintains the rem
 6. Confirmed ordinary UI edit capture; then persistent mappings, checkpoint/reload, crash/reconnect and late join.
 7. Load/soak tests with realistic parks and frame-time measurement, followed by supported resource/undo/transform expansion.
 
-Current position: local parts of gates 1, 3–5 and one host-Create part of gate 6 passed in controlled diagnostics. The remote route, general guest/manual edits, ownership, automatic durable recovery and resync remain open. 082 adds a concrete request-latency investigation before choosing a production polling budget. No playable release or complete park synchronization is claimed.
+Current position: local parts of gates 1, 3–5 and one host-Create part of gate 6 passed in controlled diagnostics. The remote route, general guest/manual edits, ownership, automatic durable recovery and resync remain open. 083 adds pacing/recovery controls and 084 changes the preferred boundary to own local IPC. Step 12 will revalidate actual scenery application on the new transport before extending it. No playable release or complete park synchronization is claimed.
 
 ## Registry and Undo decisions informed by 064–068
 

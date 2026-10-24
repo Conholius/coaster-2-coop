@@ -1,12 +1,18 @@
 # Current research status
 
-**Updated 2026-10-23; reviewed through diagnostic 082. Two local clients and manual host Create replication passed. No released playable co-op or full simulation synchronization.**
+**Updated 2026-10-24; reviewed through diagnostic 084 Step 11 and the own-logger test. Own local transport is promising; Step 12 manual Create is prepared, not yet verified. No released playable co-op or full simulation synchronization.**
 
 [Overview](../../README.md) · [Runtime tests](../testing/RUNTIME_TESTS.md) · [Latest ledger](DIAGNOSTICS_069_082.md) · [HTTP latency](../networking/HTTP_LATENCY_080_082.md) · [Design](../networking/HTTP_SYNC_DESIGN.md)
 
+## Current direction
+
+Kepler HTTP remains useful historical evidence, but its observed request-history-dependent one-second tails are unsatisfactory for responsive editing. The preferred experimental path is now our own DLL, a bounded asynchronous local pipe bridge and an external companion. [Detailed 083/084 findings and timing boundaries](../networking/NATIVE_BRIDGE.md) · [Latest evidence ledger](DIAGNOSTICS_083_084.md).
+
+The own logger works without ACSEDebug; it replaces our diagnostic output, not ACSE itself or a full debugger. The owner reports an unresolved crash reporter at game exit. A native-pipe scenery Create result has not yet been reviewed.
+
 ## Verified in a running game
 
-Reported environment: Windows/Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 2.7.0, ACSEDebug 0.014. Public executable/package hashes are not established. Tests are owner-run diagnostics, not an automated multiplayer QA suite.
+Reported initial environment: Windows/Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 2.7.0, ACSEDebug 0.014. New own-logger/Step-11 runs use the owner's ACSEDebug-disabled setup. Public executable/package hashes are not established. Tests are owner-run diagnostics, not an automated multiplayer QA suite.
 
 - **007–034:** local hierarchy/Create/Move/Delete, explicit commits, save/reload, independent identical resources and guarded separate-run replay.
 - **035–047:** native loopback GET/text and relaxed Kepler readiness. Tested requests work without active Frontier connectivity once a valid Kepler user context exists. Original 038 was sequential; its later tropical-park repeat passed simultaneous numbered exchange.
@@ -22,7 +28,13 @@ Reported environment: Windows/Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 
 - **080/081:** that confirmed placement replicates while the distinct next preview on A remains local and active in all sampled observations. Neither test sends an unconfirmed preview.
 - **082:** all 14 phases and 1,200 probes passed: A 480, B 600, sandboxed Python 120; no bad bodies, all native tasks joined and all participants/server completed. No editor or save calls.
 
-## Current latency finding
+- **083:** four spacings (50/250/500/1,000 ms), 220 valid probes and 224 joined tasks each. 50/250-ms runs develop one-second tails; all 60 post-pause probes are fast after 120 seconds without diagnostic requests. Exact throttling implementation remains hypothetical.
+- **084 Steps 6–8:** direct profiled Lua-string exchange, invalid-input and stack/result checks; 4,100 round trips and 13 confirmed full GCs passed.
+- **084 Steps 9/10:** pipe communication inside one sandbox and across to external Python passed, including deliberate delayed replies while Advances continued.
+- **Own logger test:** 1,000 exact messages with and without ACSEDebug; no missing/altered records and both completion markers true.
+- **084 Step 11:** both local sandboxed game clients and external Python pass 1,000 messages in each direction. A/B record 146/175 Advances during the held message; 112 reverse messages are acknowledged during that interval. Both Lua/native pairs and Python complete; no game/save changes.
+
+## Historical Kepler latency finding and later decision
 
 **Observed:** 080 took 591.284 ms from original host commit return to confirmation on A; 081 took 2,239.214 ms. These include proof/poll/verification gates. In 081, the B commit call was 0.017 ms, completion wait 16.231 ms, and command reception to completed commit 136.577 ms.
 
@@ -34,7 +46,7 @@ Reported environment: Windows/Steam, PC2 1.11.4.1011357, ACSE 0.729, ForgeUtils 
 
 Use a minimal logical-key/local-Part-ID/revision registry, immutable command status, fresh Entity-ID lookups, ordered accepted events and application acknowledgements. Transmit changed supported objects rather than continuously retransmitting every unchanged object. Keep sampled verification and recovery outside the delivery-critical path where safely validated; retain native completion and duplicate guards.
 
-HTTP remains a candidate. Kepler's observed request behavior must be measured separately from HTTP as a protocol. Adaptive polling, bounded batching, long polling, persistent connections and a local sidecar are options to test, not proven fixes. Fewer Advances are not by themselves an optimization target: distinguish CPU work, completion observation, verification and visual frames.
+Kepler is no longer the preferred experimental transport. This does not reject HTTP as a remote protocol for an external companion. The own local DLL/pipe bridge is executed through Step 11; remote transport, reconnect and game-effect replication over it remain unproven. Retain the earlier immutable identity, admission, completion and application-proof requirements. Fewer Advances are not by themselves an optimization target: distinguish CPU work, completion observation, verification and visual frames.
 
 ## Not demonstrated
 
@@ -48,9 +60,9 @@ HTTP remains a candidate. Kepler's observed request behavior must be measured se
 
 ## Next milestones
 
-1. Vary request spacing/count and recovery pauses; distinguish pre-connect delay from post-response native completion, using a TCP trace if needed.
-2. Extend actual manual host capture to Move/Delete, then repeated placement, cancellation and Undo ownership.
-3. Validate a remote secured relay and practical host/join UX separately from world replication.
+1. Run 084 Step 12: one manual host rock to Guest through the native bridge, preserving the next local preview and testing identical redelivery. No result reviewed yet.
+2. Test pipe/companion interruption and recovery, then manual Move/Delete, repeated placement, cancellation and Undo ownership. Do not transfer HTTP recovery guarantees automatically.
+3. Isolate and fix the reported exit crash; validate a remote secured companion link and practical host/join UX separately.
 4. Integrate durable metadata/checkpoints and explicit ambiguous-crash reconciliation before promising general recovery.
 
 Historical 005/006 outside-Sandboxie findings remain unchanged. Later successful Host/Guest tests supersede the old "guest unvalidated" status only for the tested arrangement; they do not certify every isolation boundary.

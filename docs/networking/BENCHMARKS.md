@@ -1,10 +1,27 @@
 # Transport and editor measurements
 
-**Updated 2026-10-23 through 082.** [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [080–082 latency details](HTTP_LATENCY_080_082.md) [Transport](TRANSPORT.md) · [Earlier ledger](../research/DIAGNOSTICS_035_049.md) · [050–068 ledger](../research/DIAGNOSTICS_050_068.md)
+**Updated 2026-10-24 through 084 Step 11.** [Latest ledger](../research/DIAGNOSTICS_069_082.md) · [080–082 latency details](HTTP_LATENCY_080_082.md) [Transport](TRANSPORT.md) · [Earlier ledger](../research/DIAGNOSTICS_035_049.md) · [050–068 ledger](../research/DIAGNOSTICS_050_068.md)
 
 All numbers below are owner-run local tests on the reported PC2 setup, not public automated two-client QA. Read timing boundaries before comparing columns. Raw logs and personal machine details stay private.
 
-## Latest result: two clients and native-request delay
+## Latest result: own local DLL/pipe channel
+
+The preferred experiment now uses an own DLL, local pipes and external Python; Kepler's history-dependent seconds-long waits were unsatisfactory. HTTP as a protocol is not disproved. [Full timings, GC/logger tests and boundaries](NATIVE_BRIDGE.md) · [083–084 evidence](../research/DIAGNOSTICS_083_084.md).
+
+| Test | DLL exchange median / P95, ms | Lua confirmation median / P95, ms |
+| --- | --- | --- |
+| 084 Step 9, Python in sandbox | 0.1144 / 0.1745 | 12.2530 / 13.7061 |
+| Step 10, Python outside | 0.1030 / 0.1602 | 11.5627 / 12.2336 |
+| Step 11 A | 0.1184 / 0.3824 | 14.9883 / 31.2429 |
+| Step 11 B | 0.1211 / 0.4592 | 21.6822 / 24.5609 |
+
+Steps 9/10 are echoes; Step 11 includes the receiving game's validation and returned proof. DLL exchange covers individual pipe requests/polls, not that whole game-to-game round trip. Do not compare these unlike timing boundaries as a universal speedup. Step 11 normal Lua maxima were 168.9374 / 39.7946 ms; queue residence median was 5.3057 ms.
+
+During Step 11's 2,001.2016-ms hold, A/B continued 146/175 Advances and 112 reverse messages were acknowledged. Delay-window max gaps were 22.6718/13.3105 ms. Step 8 passed 4,100 string rounds/13 full GCs, and logger runs with/without ACSEDebug both had 0.0166-ms median enqueue times and 1,000 exact messages. These are local elapsed timings and sampled callbacks, not WAN capacity, rendered-frame or game-commit benchmarks.
+
+083 completed 220 correct probes at each of four spacings. PRE requests above 900 ms: 54/160 at 50 ms, 26/160 at 250 ms, none at 500/1,000 ms. After a 120-second no-request pause, none of the 60 POST probes in any run exceeded 900 ms. Exact Kepler pacing/quota is hypothetical; finite slower runs do not prove an unlimited safe rate.
+
+## Earlier result: two clients and native-request delay
 
 082 completed all fourteen phases and 1,200 verified probes (200 warmup / 1,000 measured). A/B/P counts 480/600/120; game tasks 552/552 and 646/646 joined; all participants/server Completed=true. Initial single-client medians are 15.85 ms (A) and 23.81 ms (B), but later B medians remain about 944–947 ms with either backlog and separate listeners. Python in Guest sandbox has total medians 0.94–0.99 ms; max 24.04 ms.
 

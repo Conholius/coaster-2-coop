@@ -11,7 +11,8 @@ The project is research-first. Read **current results** before **historical inve
 | Does the co-op mod already work? | [Project README](../README.md) and [current status](research/STATUS.md) |
 | Which PC2 calls actually worked? | [Runtime tests and diagnostics](testing/RUNTIME_TESTS.md) |
 | What is the tested local host/guest setup? | [Sandboxie installation notes](ISOLATED-INSTALLATION.md) |
-| Why are some requests slow? | [080–082 latency investigation](networking/HTTP_LATENCY_080_082.md) |
+| Why move away from Kepler? | [083 pacing results and own native bridge](networking/NATIVE_BRIDGE.md) |
+| What replaces ACSEDebug logging? | [Own logger and its limits](networking/NATIVE_BRIDGE.md#own-logger-independent-of-acsedebug) |
 | What is the next experiment? | [Current open questions](research/OPEN_QUESTIONS.md) |
 | What is still unknown? | [Open questions](research/OPEN_QUESTIONS.md) |
 
@@ -25,9 +26,10 @@ The project is research-first. Read **current results** before **historical inve
 | Save/load and object persistence | [Serialization](serialization/README.md) | Local persistence and controlled saved-checkpoint client reload |
 | Recovery and Undo history | [Recovery findings](networking/RECOVERY_AND_HISTORY.md) | ACK/reset/server recovery, checkpoint reload, native-history loss and Move counteractions |
 | Dependencies, bytecode and tooling | [Modding](modding/README.md) | Source research + limited runtime loading |
-| Command transport | [Native HTTP](networking/TRANSPORT.md) | Native GET/text responses, readiness and disconnect controls |
+| Current local transport | [Own DLL and companion](networking/NATIVE_BRIDGE.md) | Direct Lua strings, GC, own logging and two-client Named-Pipe messaging passed |
+| Historical command transport | [Native HTTP](networking/TRANSPORT.md) | Earlier GET/text and scenery/recovery tests; Kepler no longer preferred |
 | Synchronization design | [Host/relay protocol](networking/HTTP_SYNC_DESIGN.md) | Proposed complete architecture; scripted two-client and single manual Create paths verified |
-| Performance | [Measurements](networking/BENCHMARKS.md) | HTTP, grouped edits, registry/query profiling and two-client native/Python controls through 082 |
+| Performance | [Measurements](networking/BENCHMARKS.md) | HTTP, grouped edits, registry/query profiling and two-client native/Python controls through 084 Step 11 |
 | Two-client acceptance criteria | [Prototype plan](prototype/PLAN.md) | Completed diagnostic gates and remaining product work |
 
 ## Evidence and chronology
@@ -36,7 +38,7 @@ The project is research-first. Read **current results** before **historical inve
 - [**EVIDENCE.md**](research/EVIDENCE.md): where each claim comes from and what it does **not** prove.
 - [**LOG.md**](research/LOG.md): chronological experiments, including failures and superseded hypotheses.
 - [**OPEN_QUESTIONS.md**](research/OPEN_QUESTIONS.md): active blockers, in priority order.
-- [**Runtime diagnostics**](testing/RUNTIME_TESTS.md): checkpoints through 082; ledgers [007–034](research/DIAGNOSTICS_007_034.md), [035–049](research/DIAGNOSTICS_035_049.md), [050–068](research/DIAGNOSTICS_050_068.md) and [069–082](research/DIAGNOSTICS_069_082.md).
+- [**Runtime diagnostics**](testing/RUNTIME_TESTS.md): checkpoints through 084 Step 11; ledgers [007–034](research/DIAGNOSTICS_007_034.md), [035–049](research/DIAGNOSTICS_035_049.md), [050–068](research/DIAGNOSTICS_050_068.md) [069–082](research/DIAGNOSTICS_069_082.md) and [083–084](research/DIAGNOSTICS_083_084.md).
 
 ## Ground rules
 

@@ -107,3 +107,16 @@ Future entries: record date, test build + SHA-256, original symbol/source, test 
 - Updated the README, status, evidence, open questions, transport/design/recovery/performance/prototype and setup notes. Raw game archives, personal paths and private logs remain unpublished. No playable internet co-op, lobby integration, full simulation or arbitrary-crash exactly-once claim.
 
 See [069–082 ledger](DIAGNOSTICS_069_082.md) and [080–082 latency analysis](../networking/HTTP_LATENCY_080_082.md).
+
+## 2026-10-24 — Kepler pacing evidence and own native bridge through 084 Step 11
+
+- Reread interval-labelled 083 logs: all four runs passed 220 probes and 224 joined tasks; 50/250-ms request histories develop one-second tails, 120-second no-request pauses restore fast samples. Exact internal pacing mechanism/quota remains hypothetical.
+- Kepler is set aside as preferred experimental transport because its observed responsiveness is unsatisfactory. HTTP itself is not disproved and the earlier command/recovery research remains useful.
+- Incremental 084 native loading/logging/string experiments progressed after early failures. Profile-gated direct string input/output and stack/result checks passed, followed by 4,100 endurance rounds, 13 confirmed full GCs and retained-answer validation.
+- Steps 9/10 passed local pipes inside one sandbox and across to external Python. The separate own Lua logger wrote 1,000 exact fixture messages in each with/without-ACSEDebug run. This replaces our diagnostic output, not ACSE, a full debugger or all engine logging.
+- Step 11 passed on two actual local sandboxed clients with external Python: 1,000 messages each direction verified/acknowledged; both Lua/native completions and Python completion true, matching counters and no worker errors. During the two-second A-to-B hold, 112 reverse messages were acknowledged and both Advances continued.
+- Own native-pipe manual Create is prepared as Step 12. No reviewed result: do not relabel the earlier successful HTTP manual Create as a passed native-bridge scenery effect.
+- Record the owner's recurring exit crash reporter as unresolved, not fixed by replacing ACSEDebug logging. No controlled root-cause isolation or crash-free exit claim.
+- Updated current overview, status, roadmap, transport/benchmark/evidence indexes and historical HTTP context. No game run, installation/save/config change, proprietary source/binary, raw log, session identifier or personal path is part of this publication.
+
+[083–084 ledger](DIAGNOSTICS_083_084.md) · [Own native bridge, logger and measured limits](../networking/NATIVE_BRIDGE.md).

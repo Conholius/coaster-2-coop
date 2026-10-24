@@ -2,9 +2,27 @@
 
 [← Documentation guide](../README.md) · [Current status](../research/STATUS.md) · [Scenery research](../placement/README.md)
 
-**Updated 2026-10-23, reviewed through 082.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
+**Updated 2026-10-24, reviewed through 084 Step 11 and the own-logger test. Step 12 remains prepared/unverified.** This page separates experiments that **ran in PC2**, tests that were **not run**, and historical failures. Log excerpts here are short manually transcribed observations; **complete private logs are not committed**.
 
-## Latest completed gates — 069–082
+## Latest completed gates — 083/084
+
+[Detailed evidence ledger](../research/DIAGNOSTICS_083_084.md) · [Native bridge, measurements and limits](../networking/NATIVE_BRIDGE.md).
+
+| Test | Runtime result | Limit |
+| --- | --- | --- |
+| 083, four spacing runs | 220 correct probes and 224 joined tasks each; one-second tails at 50/250 ms; fast samples restored after a 120-second pause | Internal limiter/quotas hypothetical, 500/1,000-ms runs finite |
+| 084 Steps 6/7 | Direct Lua input/output strings with build/stack/result checks and invalid-input rejection | Exact tested native profile, not arbitrary Lua ABI |
+| Step 8 | 4,100 round trips, 13 full GCs/control canaries, 6,662 retained-answer checks; both completion markers true | No universal memory/GC proof |
+| Steps 9/10 | 1,010 messages plus three Python notices each; one-sandbox then sandbox-to-external-Python pipe; all completions | Same machine |
+| Own logger, both modes | File-content review: 1,000 exact test lines / 1,014 queued records each; no losses or errors; both completion markers true | Owner-disabled ACSEDebug, not auto-detected; logger is not full engine debugger |
+| Step 11 | 1,000 messages each direction verified and acknowledged; own logging; both Lua/native pairs and external Python complete | Message-only local relay; no game/save mutations |
+| Step 12 | Code and instructions supplied for manual Create, next-preview continuity and duplicate application guard | **Not a passed test yet** |
+
+Step 11 held one A-to-B message for 2,001.2016 ms while 112 B-to-A messages were acknowledged. A/B observed 146/175 Advances during the delay, with max gaps 22.6718/13.3105 ms. These are Advance observations, not rendered-frame telemetry. The earlier HTTP scenery/recovery results do not automatically apply to this native channel.
+
+The owner reports a recurring crash reporter at game exit, including the reported setup without ACSEDebug. The cause has not been isolated. Successful diagnostic/channel completion must not be described as proof of a crash-free process shutdown.
+
+## Earlier completed gates — 069–082
 
 The earlier tables retain their historical scope. [069–082 ledger](../research/DIAGNOSTICS_069_082.md) contains the later per-test outcomes and corrected/aborted-run distinctions.
 
@@ -30,7 +48,7 @@ The earlier tables retain their historical scope. [069–082 ledger](../research
 | PC2 game build | `1.11.4.1011357` (self-reported at log startup) |
 | ACSE | `0.729` |
 | ForgeUtils | `2.7.0` |
-| ACSEDebug | `0.014`, cross-game package; logging works, GUI safety not established |
+| ACSEDebug | Historical tests used `0.014`; own-logger and Step-11 runs were performed without it per owner setup; interactive GUI compatibility remains unproven |
 | Diagnostic mod | `PC2CoopDiagnostics`, Lua code packed as `Main.ovl` |
 | Game execution for diagnostics 005 and 006 | **Separate copied test installation, but *not* launched through Sandboxie**, per tester confirmation |
 | Game / mod binary SHA-256 | Not published / not established in these records |
@@ -120,9 +138,9 @@ This documentation update does not run the game. Older overwritten logs are summ
 
 ## Next experiment and unproven scope
 
-Simultaneous local messaging, scripted events and one ordinary host Create have now passed in 071–081. Next isolate the native request delay from 082, extend manual Move/Delete, and test the remote relay route. Earlier local recovery/benchmark outcomes through 068 are in the [050–068 ledger](../research/DIAGNOSTICS_050_068.md); later evidence is in [069–082](../research/DIAGNOSTICS_069_082.md). [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
+Simultaneous local messaging, scripted events and one ordinary host Create have now passed in 071–081. 083 has now tested request spacing/recovery and 084 supplies the preferred own local bridge. Next validate Step 12 game-effect replication, pipe recovery and exit behavior, then extend manual Move/Delete and a secured remote route. Earlier local recovery/benchmark outcomes through 068 are in the [050–068 ledger](../research/DIAGNOSTICS_050_068.md); later evidence is in [069–082](../research/DIAGNOSTICS_069_082.md). [Proposed protocol](../networking/HTTP_SYNC_DESIGN.md).
 
-No simultaneous/internet gameplay, ordinary player-edit capture, automatic general durable deduplication, distributed reconnect/resync or full simulation synchronization is established. 062 tests server restart with a surviving client ledger; 063 tests client reload from a completed saved checkpoint, not arbitrary crash recovery. Full Steam/Cloud isolation and second guest configuration remain unvalidated.
+No general free-editing/internet gameplay, broad player-edit capture, automatic durable deduplication, distributed reconnect/resync or full simulation synchronization is established. Specific local scripted edits and one HTTP manual Create remain verified as described above. 062 tests server restart with a surviving client ledger; 063 tests client reload from a completed saved checkpoint, not arbitrary crash recovery. Full Steam/Cloud isolation remains unvalidated; later successful local Guest runs establish only their tested arrangement.
 
 ## Evidence handling
 

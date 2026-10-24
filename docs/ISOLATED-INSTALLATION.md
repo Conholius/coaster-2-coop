@@ -14,7 +14,7 @@ The following paths are relative to the local workspace; their precise absolute 
 
 - `installation/work/coop-anything/local/test-install`: a separate copy of the game.
 - `installation/work/coop-anything/local/sandboxes/PC2CoopHost`: redirected files, settings and Steam state for the test environment.
-- `installation/work/coop-anything/local/sandboxes/PC2CoopGuest`: a separate spare sandbox with networking blocked; **no second game client has been validated**.
+- `installation/work/coop-anything/local/sandboxes/PC2CoopGuest`: originally an unvalidated spare sandbox; later Host/Guest tests passed after permission/startup corrections. The initial networking-blocked description is historical.
 - `installation/work/coop-anything/local/backups`: backups of mod files.
 - `installation/work/coop-anything/local/installation-manifest.json`: setup state and the checked game version.
 
@@ -55,3 +55,23 @@ This page's earlier unvalidated-Guest statements describe the original setup dat
 Start the diagnostic relay first, the Python control in the named Guest box, then both games/tropical parks. Leave all participants alive until every phase/final completion. Restarting one participant against an already advanced 082 session is unsupported; a fresh run requires all participants and server to restart.
 
 This is same-machine testing, not a requirement for the final product's lobby or guest-local saving. It does not demonstrate complete Steam/Cloud/account/save isolation, remote access, licensing portability or service-shutdown independence. [Latest evidence](research/DIAGNOSTICS_069_082.md) · [HTTP controls](networking/HTTP_LATENCY_080_082.md).
+
+## Own local pipe bridge — 084 Steps 10/11, 2026-10-24
+
+Step 10 passed with Host inside its sandbox and Python outside. Step 11 passed with both local game clients, one external Python process and separate endpoints. Python reports sandboxieInjected=false; matching role/session records and mutual acknowledgements provide the cross-process test evidence.
+
+The narrowly scoped Step-11 rules are:
+
+~~~ini
+[PC2CoopHost]
+OpenPipePath=PlanetCoaster2.exe,\Device\NamedPipe\PC2Coop084Step11A
+
+[PC2CoopGuest]
+OpenPipePath=PlanetCoaster2.exe,\Device\NamedPipe\PC2Coop084Step11B
+~~~
+
+These headings identify existing sections; merge rules into them rather than creating duplicate sections. Do not replace the rest of the owner's configuration. Step 12 has separate proposed endpoints and is not yet a completed test.
+
+The external companion runs under the same Windows user, before both copied game clients. ACSEDebug is removed for the own-logger/new messaging tests; ACSE and the diagnostic component remain. Each DLL determines its own installation-relative log path. These local rules do not grant internet multiplayer, complete process isolation or a general Steam/account/cloud guarantee. Game startup/licensing remains a separate dependency from the chosen IPC path.
+
+Reference for the setting: [Sandboxie OpenPipePath documentation](https://sandboxie-plus.github.io/sandboxie-docs/Content/OpenPipePath/). This update publishes the tested rule shape; it does not modify the owner's Sandboxie configuration.

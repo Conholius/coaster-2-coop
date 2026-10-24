@@ -1,6 +1,6 @@
 # Evidence index
 
-These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 082 are indexed in the later sections and in [STATUS.md](STATUS.md).
+These are names of locally researched materials, **not bundled source files**. The original copies remain under ignored `local/` or a separately maintained authorized evidence archive. The dates/builds below are file-label claims, not necessarily the version of the installed executable. The first table and 005/006 entries preserve their historical evidence scope; current runtime results through 084 Step 11 are indexed in the later sections and in [STATUS.md](STATUS.md).
 
 | Area | Local source material | Confirmed symbols/observations | Qualification |
 | --- | --- | --- | --- |
@@ -134,3 +134,20 @@ Source-function links are in [ACSE/ForgeUtils](../placement/ACSE_FORGEUTILS.md) 
 | Supplied UI/interface catalogue and editor reconstructed sources | Existing view/dialog mechanisms and editor confirmation/commit boundaries inspected | No new main-menu Co-op entry, lobby, generic intercept framework or source runtime equivalence established |
 
 Private diagnostic identifiers and full log files are intentionally not published. Names of original mod diagnostic functions identify the measured code path without redistributing proprietary game source.
+
+## Own native transport and diagnostics — 083/084, reviewed 2026-10-24
+
+[Per-step ledger](DIAGNOSTICS_083_084.md) · [Measured architecture and limits](../networking/NATIVE_BRIDGE.md). Private logs were reviewed; no game test was launched for this update.
+
+| Private evidence anchor | Finding | Boundary |
+| --- | --- | --- |
+| 083 interval-labelled PRE/POST GROUP/MEASURE and RESULT | Four successful 220-probe runs, 224 tasks joined each, fast post-pause samples after one-second tails at 50/250 ms | Supports history dependence; exact internal quota/scope unknown |
+| 084 Step 6 Direct / Step 7 Return logs | Direct-string copies and game-managed returned strings, version/stack/result checks | Exact profiled game build, not generic Lua ABI |
+| Step 8 native/game summaries | 4,100 rounds, 13 confirmed full GCs, 6,662 retained checks, both completions | Finite GC/endurance test |
+| Step 9/10 native, game and Python records | Same-sandbox then cross-boundary pipe; external Python reports no SbieDll; 1,010 messages and three notices each | Local IPC, not WAN |
+| Own LuaLog With/WithoutACSEDebug files | 1,000 fixtures checked line-by-line in order, zero content errors, 1,014 queued records each, workerError=0 | Mode labels are not installation detection; own diagnostic output only |
+| Step 11 role A/B native logs and Python summary | 1,000 confirmed messages each way; wire counters 6,679/6,668 match Python; all completion markers; 112 reverse ACKs during held A message | Own logger used; no scenery effect, reconnect or production-network proof |
+| Step 12 supplied code/instructions | Manual native-pipe Create and immutable duplicate test prepared | No reviewed outcome yet |
+| Owner exit-crash report | Crash reporter appears on game termination, reportedly also without ACSEDebug | Root cause and fix unverified |
+
+The own logger's completion footer records Lua's finalization request and native worker completion. Its post-close return acknowledgement is a separate observation. Private executable/code hashes, session identifiers, raw files and machine-specific paths are intentionally not published.

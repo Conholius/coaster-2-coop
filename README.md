@@ -1,8 +1,8 @@
 # Planet Coaster 2 — Real-Time Co-op Research
 
-> **Project status — 2026-10-23, reviewed through diagnostic 082:** Two simultaneous local PC2 clients passed scripted scenery Create/Move/Delete, Undo/Redo, redelivery and controlled recovery tests. One manually placed host rock is replicated to the guest while the host's next preview stays active. **This is a working diagnostic prototype, not a released playable co-op mod.** A completed 1,200-probe comparison localizes intermittent roughly one-second waits to the native Kepler request interval; the precise cause remains open.
+> **Project status — 2026-10-24, diagnostic 084 through Step 11:** Kepler's history-dependent seconds-long delays are unsatisfactory for responsive co-op, so development is moving to our own native DLL, local Named Pipes and external companion. Direct Lua strings, GC endurance, an own logger without ACSEDebug and 1,000 confirmed messages each way between two running local clients have passed. **Promising diagnostic prototype, not released internet co-op.** Manual Create over this new transport is prepared as Step 12, not yet verified.
 
-We are investigating how two players might build in the same **Planet Coaster 2** park in real time. The current scope is supported scenery: confirmed changes, logical object mappings, guarded application and recovery. Next priorities are request-latency diagnosis and ordinary manual Move/Delete capture. Internet play, a host/join lobby and automatic general recovery are not yet verified. Guests, rides, terrain, economy and full simulation synchronization remain outside the initial scope.
+We are investigating how two players might build in the same **Planet Coaster 2** park in real time. The current scope is supported scenery: confirmed changes, logical object mappings, guarded application and recovery. Next priorities are manual Create over the new native bridge, then Move/Delete capture and transport recovery. Internet play, a host/join lobby and automatic general recovery are not yet verified. Guests, rides, terrain, economy and full simulation synchronization remain outside the initial scope.
 
 ## Progress at a glance
 
@@ -23,7 +23,9 @@ We are investigating how two players might build in the same **Planet Coaster 2*
 | Registry and performance | **Passed:** synthetic minimal/full registry tests to 100,000 entries (066), real-object queries/moves with 2,701 rocks (067/068). |
 | Manual host placement to guest | **Verified for one AQ_Rock_04:** corrected 079; 080/081 keep the next host preview active and local. Manual Move/Delete capture remains open. |
 | Catalogue lookup | **Targeted queries passed (070):** avoids the 7,263-row materialization measured separately in 069. |
-| HTTP latency | **Measured (080–082):** native requests can approach one second while server/Python controls remain fast. Cause and safe request budget are not established. |
+| Kepler decision | **082/083:** repeated native requests develop roughly one-second waits; spacing and a quiet pause affect them. Set aside as the preferred transport; the exact internal limiter remains unknown. |
+| Own native communication | **084 Step 11 passed:** two local clients in separate sandboxes, Python outside, 1,000 verified messages each way and continued reverse traffic during a two-second forwarding delay. |
+| Own diagnostic logger | **Passed with and without ACSEDebug:** 1,000 exact test messages each; own asynchronous file output. ACSE remains the loader; this is not a full interactive debugger. |
 
 The successful 005/006 logs came from a **copied test installation launched outside Sandboxie**. They establish PC2 behavior in that copied installation, **not** validation of the fully sandboxed launch path. A separate Sandboxie setup is documented below. See the [runtime test record](docs/testing/RUNTIME_TESTS.md).
 
@@ -31,7 +33,7 @@ The successful 005/006 logs came from a **copied test installation launched outs
 
 - **[Documentation guide](docs/README.md)** — a map of the project by topic.
 - **[Current research status](docs/research/STATUS.md)** — concise verified findings, limitations and next milestone.
-- **[Runtime tests (005–082)](docs/testing/RUNTIME_TESTS.md)** — what was actually tested, failures and controls.
+- **[Runtime tests (005–084)](docs/testing/RUNTIME_TESTS.md)** — what was actually tested, failures and controls.
 - **[Scenery placement and undo](docs/placement/README.md)** — the path toward creating a durable park object.
 - **[Sandboxie test setup](docs/ISOLATED-INSTALLATION.md)** — separate host/guest boxes, token compatibility and isolation caveats.
 - **[Prototype plan](docs/prototype/PLAN.md)** — acceptance criteria for one replicated scenery part.
@@ -42,7 +44,7 @@ For historical experiments and traceability: [research log](docs/research/LOG.md
 
 Our component now uses the scenery hierarchy, create/edit/destroy operations, completed previews and single commits. Creation, movement and deletion were checked after local save/manual reload. Two identical rocks can be addressed independently. Commands reject tested ordering errors and conflicting ID reuse. See the [007–034 diagnostic ledger](docs/research/DIAGNOSTICS_007_034.md).
 
-Diagnostic 030 matched canonical states without networking. The later 038 repeat and 071–082 now establish simultaneous local clients, scripted replicated operations and one ordinary confirmed host placement. [Native HTTP transport](docs/networking/TRANSPORT.md) works with a ready Kepler user context; [latency profiling](docs/networking/HTTP_LATENCY_080_082.md) records an unresolved native-request delay. Remote clients, general manual Move/Delete capture, concurrent ownership and automatic durable recovery remain open.
+Diagnostic 030 matched canonical states without networking. The later 038 repeat and 071–082 now establish simultaneous local clients, scripted replicated operations and one ordinary confirmed host placement. [Native HTTP transport](docs/networking/TRANSPORT.md) works with a ready Kepler user context; [latency profiling](docs/networking/HTTP_LATENCY_080_082.md) and 083 record native-request delays. [The new DLL/Named-Pipe bridge](docs/networking/NATIVE_BRIDGE.md) now provides a tested local alternative; the earlier HTTP manual-Create result is not yet a native-pipe Create result. Remote clients, general manual Move/Delete capture, concurrent ownership and automatic durable recovery remain open.
 
 Read the [050–068 evidence ledger](docs/research/DIAGNOSTICS_050_068.md), [recovery/history findings](docs/networking/RECOVERY_AND_HISTORY.md), [035–049 evidence ledger](docs/research/DIAGNOSTICS_035_049.md), [transport/editor measurements](docs/networking/BENCHMARKS.md) and [proposed HTTP synchronization design](docs/networking/HTTP_SYNC_DESIGN.md). The complete architecture remains proposed; the tested manual-Create path is documented in the [069–082 ledger](docs/research/DIAGNOSTICS_069_082.md).
 
@@ -50,7 +52,7 @@ An earlier custom world component caused a crash during the menu-to-park transit
 
 ## Compatibility and safety
 
-The runtime logs identify **PC2 1.11.4.1011357**, **ACSE 0.729**, **ForgeUtils 2.7.0** and **ACSEDebug 0.014**. The cross-game ACSEDebug package captured log messages, but its **debug GUI and native helpers are not verified safe in PC2**; avoid the GUI. The exact package provenance should not be inferred from the logs.
+The runtime logs identify **PC2 1.11.4.1011357**, **ACSE 0.729**, **ForgeUtils 2.7.0** and **ACSEDebug 0.014**. The cross-game ACSEDebug package captured log messages, but its **debug GUI and native helpers are not verified safe in PC2**; avoid the GUI. The exact package provenance should not be inferred from the logs. The newer own-logger and Step-11 messaging tests run without ACSEDebug. The owner still reports a crash reporter at game exit; its cause is unknown and successful in-test channel closure is not proof of crash-free game shutdown.
 
 Use only backed-up, disposable installs and test parks. The [Sandboxie notes](docs/ISOLATED-INSTALLATION.md) describe a past startup compatibility setting, `UnstrippedToken=y`, which **reduces token isolation**. It does not prove a Denuvo defect or establish full cloud/save isolation. Do not use the old diagnostic launcher without checking its mod-restoration side effects.
 
@@ -62,8 +64,9 @@ This repository contains our own notes, not redistributed game binaries, assets,
 | --- | --- |
 | Lua / world architecture | [Architecture](docs/architecture/OVERVIEW.md) |
 | Editing / undo / creation | [Placement](docs/placement/README.md) and [ACSE + ForgeUtils research](docs/placement/ACSE_FORGEUTILS.md) |
-| Command transport | [Native HTTP contract and service dependence](docs/networking/TRANSPORT.md) |
-| Proposed replication | [HTTP synchronization, identity and recovery](docs/networking/HTTP_SYNC_DESIGN.md) |
+| Current local transport and diagnostics | [Own DLL, Named Pipes and external companion](docs/networking/NATIVE_BRIDGE.md) |
+| Transport history | [Native HTTP contract and service dependence](docs/networking/TRANSPORT.md) |
+| Replication semantics | [Identity, application acknowledgements and recovery](docs/networking/HTTP_SYNC_DESIGN.md) (historical HTTP design; transport-independent guards retained) |
 | Performance | [HTTP, editor, registry and query measurements](docs/networking/BENCHMARKS.md), [080–082 latency analysis](docs/networking/HTTP_LATENCY_080_082.md) |
 | Recovery and history | [ACKs, checkpoints and counteractions](docs/networking/RECOVERY_AND_HISTORY.md) |
 | Saving / persistence | [Serialization](docs/serialization/README.md) |
